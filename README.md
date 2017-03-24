@@ -14,7 +14,7 @@
    * Editar
 4. Manter Convite
    * Criar
-   * Remover
+   * Revogar
 
 Tem dois tipos de grupos: Classroom e Anonimo.
  * Classroom:
