@@ -23,6 +23,7 @@
 
         <activity android:name=".presentation.view.activity.HomeActivity" />
         <activity android:name=".presentation.view.activity.LoginActivity" />
+        <activity android:name=".presentation.view.activity.ContaActivity" />
     </application>
 
 </manifest>

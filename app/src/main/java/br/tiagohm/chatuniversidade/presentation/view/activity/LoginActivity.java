@@ -1,6 +1,7 @@
 package br.tiagohm.chatuniversidade.presentation.view.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
@@ -9,7 +10,10 @@ import android.widget.Toast;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 
+import javax.inject.Inject;
+
 import br.tiagohm.chatuniversidade.R;
+import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import br.tiagohm.chatuniversidade.presentation.contract.LoginContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.LoginPresenter;
@@ -20,6 +24,9 @@ import butterknife.ButterKnife;
 public class LoginActivity extends MvpActivity<LoginContract.View, LoginContract.Presenter>
         implements LoginContract.View {
 
+    @Inject
+    SharedPreferences preferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +34,8 @@ public class LoginActivity extends MvpActivity<LoginContract.View, LoginContract
         setContentView(R.layout.activity_login);
 
         ButterKnife.bind(this);
+
+        App.getChatComponent().inject(this);
 
         mostrarTelaDeEntrar();
     }
@@ -56,7 +65,7 @@ public class LoginActivity extends MvpActivity<LoginContract.View, LoginContract
     @Override
     public void mostrarTelaDoUsuario(Usuario usuario) {
         Intent i = new Intent(this, HomeActivity.class);
-        i.putExtra("USUARIO", usuario);
+        preferences.edit().putString("USER_EMAIL", usuario.email).apply();
         startActivity(i);
         finish();
     }

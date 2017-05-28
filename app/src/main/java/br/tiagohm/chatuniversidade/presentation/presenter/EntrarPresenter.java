@@ -40,7 +40,7 @@ public class EntrarPresenter extends MvpBasePresenter<EntrarContract.View>
                                 @Override
                                 public void accept(Throwable t) throws Exception {
                                     Logger.d("erro ao logar");
-                                    getLoginPresenter().erroAoLogar(t.getMessage());
+                                    getLoginPresenter().erroAoLogar("Erro ao logar");
                                 }
                             });
                 }

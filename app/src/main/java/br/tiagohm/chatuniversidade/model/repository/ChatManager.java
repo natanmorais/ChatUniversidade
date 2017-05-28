@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,6 +42,8 @@ public class ChatManager {
      * Loga um usuário usando um email e uma senha.
      */
     public static Observable<Boolean> logar(final String email, final String senha) {
+        Logger.d("logar(%s, %s)", email, senha);
+
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
@@ -67,10 +70,14 @@ public class ChatManager {
      */
     public static Observable<Usuario> registrar(final String instituicao, final String nome, final int tipo, final String matricula,
                                                 final String email, final String senha) {
+        Logger.d("registrar(%s, %s)", email, senha);
+
         //Validação do email e da senha.
         //TODO Validar outros campos.
-        if (!validarLogin(email)) return Observable.error(new IllegalArgumentException("login"));
-        if (!validarSenha(senha)) return Observable.error(new IllegalArgumentException("senha"));
+        if (!validarLogin(email))
+            return Observable.error(new IllegalArgumentException("O e-mail não é válido"));
+        if (!validarSenha(senha))
+            return Observable.error(new IllegalArgumentException("A senha não é válida"));
 
         return Observable.create(new ObservableOnSubscribe<Usuario>() {
             @Override
@@ -157,5 +164,99 @@ public class ChatManager {
 
     public static void deslogar() {
         FirebaseAuth.getInstance().signOut();
+    }
+
+    public static Observable<Boolean> deletarConta() {
+        Logger.d("deletarConta()");
+
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                final String email = user.getEmail();
+                user.delete()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Logger.d("A conta foi deletada");
+                                    CHAT.child("usuarios").child(Utils.gerarHash(email))
+                                            .removeValue()
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        deslogar();
+                                                        Logger.d("A conta foi deletada");
+                                                        e.onNext(true);
+                                                        e.onComplete();
+                                                    } else {
+                                                        Logger.d("Erro ao deletar a conta");
+                                                        e.onNext(false);
+                                                        e.onComplete();
+                                                    }
+                                                }
+                                            });
+                                } else {
+                                    Logger.d("Erro ao deletar a conta");
+                                    e.onNext(false);
+                                    e.onComplete();
+                                }
+                            }
+                        });
+            }
+        });
+    }
+
+    public static Observable<Boolean> alterarSenha(final String novaSenha) {
+        if (!validarSenha(novaSenha))
+            return Observable.error(new IllegalArgumentException("A senha não é válida"));
+
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                FirebaseAuth.getInstance().getCurrentUser()
+                        .updatePassword(novaSenha)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Logger.d("A senha foi alterada");
+                                    e.onNext(true);
+                                    e.onComplete();
+                                } else {
+                                    Logger.d("Erro ao alterar a senha");
+                                    e.onNext(false);
+                                    e.onComplete();
+                                }
+                            }
+                        });
+            }
+        });
+    }
+
+    public static Observable<Boolean> atualizarUsuario(final Usuario usuario) {
+
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("usuarios").child(Utils.gerarHash(usuario.email))
+                        .setValue(usuario)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Logger.d("A conta foi atualizada");
+                                    e.onNext(true);
+                                    e.onComplete();
+                                } else {
+                                    Logger.d("Erro ao atualizar a conta");
+                                    e.onNext(false);
+                                    e.onComplete();
+                                }
+                            }
+                        });
+            }
+        });
     }
 }

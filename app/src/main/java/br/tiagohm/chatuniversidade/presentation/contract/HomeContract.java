@@ -11,5 +11,6 @@ public interface HomeContract {
 
     interface Presenter extends MvpPresenter<View> {
 
+        void deslogar();
     }
 }
