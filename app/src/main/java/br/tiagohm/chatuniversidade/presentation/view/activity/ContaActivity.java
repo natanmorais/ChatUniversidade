@@ -1,6 +1,5 @@
 package br.tiagohm.chatuniversidade.presentation.view.activity;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.widget.CheckBox;
@@ -20,7 +19,6 @@ import br.tiagohm.chatuniversidade.presentation.presenter.ContaPresenter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.functions.Consumer;
 
 public class ContaActivity extends MvpActivity<ContaContract.View, ContaContract.Presenter>
         implements ContaContract.View {
@@ -38,9 +36,7 @@ public class ContaActivity extends MvpActivity<ContaContract.View, ContaContract
     @BindView(R.id.souProfessorCb)
     CheckBox mSouProfessor;
     @Inject
-    SharedPreferences preferences;
-
-    private Usuario mUsuario;
+    ChatManager chatManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,25 +53,14 @@ public class ContaActivity extends MvpActivity<ContaContract.View, ContaContract
     protected void onResume() {
         super.onResume();
 
-        String email = preferences.getString("USER_EMAIL", null);
-        ChatManager.getUsuarioByEmail(email)
-                .subscribe(new Consumer<Usuario>() {
-                    @Override
-                    public void accept(Usuario usuario) throws Exception {
-                        mUsuario = usuario;
-                        mEmail.setText(mUsuario.email);
-                        mInstituicao.setText(mUsuario.instituicao);
-                        mNome.setText(mUsuario.nome);
-                        mMatricula.setText(mUsuario.matricula);
-                        mSouProfessor.setChecked(mUsuario.tipo == 1);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Toast.makeText(ContaActivity.this, "Um erro inesperado ocorreu!", Toast.LENGTH_LONG).show();
-                        finish();
-                    }
-                });
+        Usuario usuario = chatManager.getUsuario();
+        if (usuario != null) {
+            mEmail.setText(usuario.email);
+            mInstituicao.setText(usuario.instituicao);
+            mNome.setText(usuario.nome);
+            mMatricula.setText(usuario.matricula);
+            mSouProfessor.setChecked(usuario.tipo == 1);
+        }
     }
 
     @NonNull
@@ -86,18 +71,15 @@ public class ContaActivity extends MvpActivity<ContaContract.View, ContaContract
 
     @OnClick(R.id.salvarButton)
     public void salvarConta() {
-        if (mUsuario == null) return;
-        mUsuario.nome = mNome.getText().toString();
-        mUsuario.instituicao = mInstituicao.getText().toString();
-        mUsuario.matricula = mMatricula.getText().toString();
         presenter.salvarConta(
                 mSenha.getText().toString(),
-                mUsuario);
+                mInstituicao.getText().toString(),
+                mNome.getText().toString(),
+                mMatricula.getText().toString());
     }
 
     @OnClick(R.id.deletarButton)
     public void deletarConta() {
-        if (mUsuario == null) return;
         presenter.deletarConta();
     }
 

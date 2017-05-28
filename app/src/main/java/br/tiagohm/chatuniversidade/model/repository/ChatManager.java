@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,18 +18,32 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.orhanobut.logger.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import br.tiagohm.chatuniversidade.common.utils.Utils;
+import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.functions.Consumer;
 
-public class ChatManager {
+public class ChatManager
+        implements FirebaseAuth.AuthStateListener {
 
     private static final DatabaseReference CHAT = FirebaseDatabase.getInstance().getReference().child("chat");
+    //Eventos
+    private final UserValueEventListener userValueEventListener = new UserValueEventListener();
+    private final GroupChildEventListener groupChildEventListener = new GroupChildEventListener();
+    private Usuario mUsuario;
+    private List<Grupo> mGrupos = new ArrayList<>();
+    private List<ChatManagerListener> mListeners = new ArrayList<>();
+
+    public ChatManager() {
+        FirebaseAuth.getInstance().addAuthStateListener(this);
+    }
 
     private static boolean validarLogin(String login) {
         return Patterns.EMAIL_ADDRESS.matcher(login).matches();
@@ -36,6 +51,33 @@ public class ChatManager {
 
     private static boolean validarSenha(String senha) {
         return Pattern.compile("[a-zA-Z0-9]{8,32}").matcher(senha).matches();
+    }
+
+    private static Observable<Usuario> criarCadastroInicial(String instituicao, String nome, int tipo, String matricula,
+                                                            final String email, String senha) {
+        Logger.d("criarCadastroInicial()");
+        final Usuario usuario = new Usuario(instituicao, nome, tipo, matricula, email);
+
+        return Observable.create(new ObservableOnSubscribe<Usuario>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Usuario> e) throws Exception {
+                CHAT.child("usuarios").child(Utils.gerarHash(email))
+                        .setValue(usuario)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(usuario);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                            }
+                        });
+            }
+        });
     }
 
     /**
@@ -68,7 +110,7 @@ public class ChatManager {
     /**
      * Loga um usuário usando um email e uma senha.
      */
-    public static Observable<Usuario> registrar(final String instituicao, final String nome, final int tipo, final String matricula,
+    public static Observable<Boolean> registrar(final String instituicao, final String nome, final int tipo, final String matricula,
                                                 final String email, final String senha) {
         Logger.d("registrar(%s, %s)", email, senha);
 
@@ -79,9 +121,9 @@ public class ChatManager {
         if (!validarSenha(senha))
             return Observable.error(new IllegalArgumentException("A senha não é válida"));
 
-        return Observable.create(new ObservableOnSubscribe<Usuario>() {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
-            public void subscribe(final ObservableEmitter<Usuario> e) throws Exception {
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
                 FirebaseAuth.getInstance()
                         .createUserWithEmailAndPassword(email, senha)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -94,7 +136,7 @@ public class ChatManager {
                                             .subscribe(new Consumer<Usuario>() {
                                                            @Override
                                                            public void accept(Usuario usuario) throws Exception {
-                                                               e.onNext(usuario);
+                                                               e.onNext(true);
                                                                e.onComplete();
                                                            }
                                                        },
@@ -105,33 +147,6 @@ public class ChatManager {
                                                         }
                                                     });
                                 }
-                            }
-                        });
-            }
-        });
-    }
-
-    private static Observable<Usuario> criarCadastroInicial(String instituicao, String nome, int tipo, String matricula,
-                                                            final String email, String senha) {
-        Logger.d("criarCadastroInicial()");
-        final Usuario usuario = new Usuario(instituicao, nome, tipo, matricula, email);
-
-        return Observable.create(new ObservableOnSubscribe<Usuario>() {
-            @Override
-            public void subscribe(final ObservableEmitter<Usuario> e) throws Exception {
-                CHAT.child("usuarios").child(Utils.gerarHash(email))
-                        .setValue(usuario)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void nada) {
-                                e.onNext(usuario);
-                                e.onComplete();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception ex) {
-                                e.onError(ex);
                             }
                         });
             }
@@ -166,27 +181,65 @@ public class ChatManager {
         FirebaseAuth.getInstance().signOut();
     }
 
-    public static Observable<Boolean> deletarConta() {
+    public void add(ChatManagerListener listener) {
+        mListeners.add(listener);
+    }
+
+    public void remove(ChatManagerListener listener) {
+        mListeners.remove(listener);
+    }
+
+    //TODO Carregar está aqui!!!
+    private void carregar(FirebaseUser user) {
+        getUsuarioByEmail(user.getEmail())
+                .subscribe(new Consumer<Usuario>() {
+                    @Override
+                    public void accept(Usuario usuario) throws Exception {
+                        mUsuario = usuario;
+                        CHAT.child("usuarios").child(Utils.gerarHash(getUsuario().email))
+                                .addValueEventListener(userValueEventListener);
+                        CHAT.child("grupos").addChildEventListener(groupChildEventListener);
+                        Logger.d(getUsuario());
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable t) throws Exception {
+                        //mUsuario = null;
+                        t.printStackTrace();
+                    }
+                });
+    }
+
+    public Usuario getUsuario() {
+        return mUsuario;
+    }
+
+    public List<Grupo> getGrupos() {
+        return mGrupos;
+    }
+
+    public Observable<Boolean> deletarConta() {
         Logger.d("deletarConta()");
 
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                final String email = user.getEmail();
                 user.delete()
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
                                     Logger.d("A conta foi deletada");
-                                    CHAT.child("usuarios").child(Utils.gerarHash(email))
+                                    CHAT.child("usuarios").child(Utils.gerarHash(getUsuario().email))
                                             .removeValue()
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
-                                                        deslogar();
+                                                        CHAT.child("usuarios").child(Utils.gerarHash(getUsuario().email))
+                                                                .removeEventListener(userValueEventListener);
+                                                        //mUsuario = null;
                                                         Logger.d("A conta foi deletada");
                                                         e.onNext(true);
                                                         e.onComplete();
@@ -208,7 +261,7 @@ public class ChatManager {
         });
     }
 
-    public static Observable<Boolean> alterarSenha(final String novaSenha) {
+    public Observable<Boolean> alterarSenha(final String novaSenha) {
         if (!validarSenha(novaSenha))
             return Observable.error(new IllegalArgumentException("A senha não é válida"));
 
@@ -235,13 +288,15 @@ public class ChatManager {
         });
     }
 
-    public static Observable<Boolean> atualizarUsuario(final Usuario usuario) {
+    public Observable<Boolean> atualizarUsuario(String instituicao, String nome, String matricula) {
+
+        final Usuario novoUsuario = new Usuario(instituicao, nome, getUsuario().tipo, matricula, getUsuario().email);
 
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
-                CHAT.child("usuarios").child(Utils.gerarHash(usuario.email))
-                        .setValue(usuario)
+                CHAT.child("usuarios").child(Utils.gerarHash(getUsuario().email))
+                        .setValue(novoUsuario)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -258,5 +313,100 @@ public class ChatManager {
                         });
             }
         });
+    }
+
+    public Observable<Boolean> criarGrupo(Usuario admin, String instituicao, String nome, int tipo) {
+        final Grupo grupo = new Grupo(admin, instituicao, nome, tipo);
+
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("grupos").child(Utils.gerarHash(grupo.admin) + "_" + grupo.nome)
+                        .setValue(grupo)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        if (firebaseAuth.getCurrentUser() != null) {
+            carregar(firebaseAuth.getCurrentUser());
+        }
+    }
+
+    public interface ChatManagerListener {
+
+        void novoGrupo(Grupo grupo);
+
+        void grupoRemovido(Grupo grupo);
+    }
+
+    public class UserValueEventListener implements ValueEventListener {
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            Usuario usuario = dataSnapshot.getValue(Usuario.class);
+            if (usuario != null) {
+                mUsuario = usuario;
+            }
+            Logger.d("usuario foi alterado: %s", getUsuario());
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+        }
+    }
+
+    public class GroupChildEventListener implements ChildEventListener {
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            Grupo grupo = dataSnapshot.getValue(Grupo.class);
+            if (grupo != null && grupo.admin.equals(mUsuario.email)) {
+                if (!mGrupos.contains(grupo)) {
+                    Logger.d("Novo grupo: %s", grupo);
+                    mGrupos.add(grupo);
+                    for (ChatManagerListener l : mListeners) l.novoGrupo(grupo);
+                }
+            }
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            Grupo grupo = dataSnapshot.getValue(Grupo.class);
+            if (grupo != null) {
+                mGrupos.remove(grupo);
+                for (ChatManagerListener l : mListeners) l.grupoRemovido(grupo);
+            }
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
     }
 }

@@ -16,7 +16,7 @@ public interface ContaContract {
 
     interface Presenter extends MvpPresenter<ContaContract.View> {
 
-        void salvarConta(String senha, Usuario usuario);
+        void salvarConta(String senha, String instituicao, String nome, String matricula);
 
         void deletarConta();
     }

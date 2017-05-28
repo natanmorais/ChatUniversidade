@@ -23,11 +23,11 @@ public class RegistrarPresenter extends MvpBasePresenter<RegistrarContract.View>
                           final String email, final String senha) {
         Logger.d("registrar(...)", email, senha);
         ChatManager.registrar(instituicao, nome, tipo, matricula, email, senha)
-                .subscribe(new Consumer<Usuario>() {
+                .subscribe(new Consumer<Boolean>() {
                                @Override
-                               public void accept(Usuario usuario) throws Exception {
+                               public void accept(Boolean success) throws Exception {
                                    Logger.d("usuário criado!");
-                                   getLoginPresenter().registradoComSucesso(usuario);
+                                   getLoginPresenter().registradoComSucesso();
                                }
                            },
                         new Consumer<Throwable>() {

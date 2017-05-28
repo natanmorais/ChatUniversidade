@@ -3,7 +3,6 @@ package br.tiagohm.chatuniversidade.presentation.presenter;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import com.orhanobut.logger.Logger;
 
-import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.LoginContract;
 
@@ -23,15 +22,15 @@ public class LoginPresenter extends MvpBasePresenter<LoginContract.View>
     }
 
     @Override
-    public void logadoComSucesso(Usuario usuario) {
-        Logger.d("logadoComSucesso(%s)", usuario);
-        getView().mostrarTelaDoUsuario(usuario);
+    public void logadoComSucesso() {
+        Logger.d("logadoComSucesso()");
+        getView().mostrarTelaDoUsuario();
     }
 
     @Override
-    public void registradoComSucesso(Usuario usuario) {
-        Logger.d("registradoComSucesso(%s)", usuario);
-        getView().mostrarTelaDoUsuario(usuario);
+    public void registradoComSucesso() {
+        Logger.d("registradoComSucesso(%s)");
+        getView().mostrarTelaDoUsuario();
     }
 
     @Override

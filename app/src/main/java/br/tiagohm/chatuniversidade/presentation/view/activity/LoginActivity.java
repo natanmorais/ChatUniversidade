@@ -24,9 +24,6 @@ import butterknife.ButterKnife;
 public class LoginActivity extends MvpActivity<LoginContract.View, LoginContract.Presenter>
         implements LoginContract.View {
 
-    @Inject
-    SharedPreferences preferences;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,9 +60,8 @@ public class LoginActivity extends MvpActivity<LoginContract.View, LoginContract
     }
 
     @Override
-    public void mostrarTelaDoUsuario(Usuario usuario) {
+    public void mostrarTelaDoUsuario() {
         Intent i = new Intent(this, HomeActivity.class);
-        preferences.edit().putString("USER_EMAIL", usuario.email).apply();
         startActivity(i);
         finish();
     }

@@ -31,21 +31,9 @@ public class EmptyActivity extends BaseActivity {
         }
         //O usuário está logado.
         else {
-            ChatManager.getUsuarioByEmail(user.getEmail())
-                    .subscribe(new Consumer<Usuario>() {
-                        @Override
-                        public void accept(Usuario usuario) throws Exception {
-                            Intent i = new Intent(EmptyActivity.this, HomeActivity.class);
-                            i.putExtra("USUARIO", usuario);
-                            EmptyActivity.this.startActivity(i);
-                            EmptyActivity.this.finish();
-                        }
-                    }, new Consumer<Throwable>() {
-                        @Override
-                        public void accept(Throwable throwable) throws Exception {
-                            Toast.makeText(EmptyActivity.this, "Um erro inesperado aconteceu", Toast.LENGTH_LONG).show();
-                        }
-                    });
+            Intent i = new Intent(this, HomeActivity.class);
+            startActivity(i);
+            finish();
         }
     }
 }

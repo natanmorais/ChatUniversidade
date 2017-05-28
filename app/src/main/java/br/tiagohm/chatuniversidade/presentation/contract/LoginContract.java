@@ -15,7 +15,7 @@ public interface LoginContract {
 
         void mostrarTelaDeRegistrar();
 
-        void mostrarTelaDoUsuario(Usuario usuario);
+        void mostrarTelaDoUsuario();
 
         void showMessage(String message);
     }
@@ -26,9 +26,9 @@ public interface LoginContract {
 
         void mostrarTelaDeRegistrar();
 
-        void logadoComSucesso(Usuario usuario);
+        void logadoComSucesso();
 
-        void registradoComSucesso(Usuario usuario);
+        void registradoComSucesso();
 
         void erroAoLogar(String message);
 
