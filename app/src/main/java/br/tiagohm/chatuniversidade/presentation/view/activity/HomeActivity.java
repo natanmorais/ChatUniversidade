@@ -179,6 +179,14 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                 mView = itemView;
 
                 ButterKnife.bind(this, mView);
+
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(HomeActivity.this, "Item Clicked", Toast.LENGTH_LONG).show();
+                        //Aparecer uma tela para editar ou apagar um grupo
+                    }
+                });
             }
         }
     }
