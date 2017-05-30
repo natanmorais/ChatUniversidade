@@ -19,13 +19,14 @@ import com.google.firebase.database.ValueEventListener;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import br.tiagohm.chatuniversidade.common.utils.Utils;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.model.entity.Usuario;
-import br.tiagohm.chatuniversidade.presentation.view.activity.HomeActivity;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -39,7 +40,7 @@ public class ChatManager
     private final UserValueEventListener userValueEventListener = new UserValueEventListener();
     private final GroupChildEventListener groupChildEventListener = new GroupChildEventListener();
     private Usuario mUsuario;
-    private List<Grupo> mGrupos = new ArrayList<>();
+    private HashMap<String, Grupo> mGrupos = new HashMap<>();
     private List<ChatManagerListener> mListeners = new ArrayList<>();
 
     public ChatManager() {
@@ -215,8 +216,8 @@ public class ChatManager
         return mUsuario;
     }
 
-    public List<Grupo> getGrupos() {
-        return mGrupos;
+    public Collection<Grupo> getGrupos() {
+        return mGrupos.values();
     }
 
     public Observable<Boolean> deletarConta() {
@@ -322,8 +323,8 @@ public class ChatManager
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
-                CHAT.child("grupos").child(Utils.gerarHash(grupo.admin) + "_" + grupo.nome)
-                        .setValue(grupo)
+                final String id = CHAT.child("grupos").push().getKey();
+                CHAT.child("grupos").child(id).setValue(grupo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void nada) {
@@ -342,15 +343,13 @@ public class ChatManager
         });
     }
 
-    public Observable<Boolean> editarGrupo(Usuario admin, String nomeAntigo, String nomeNovo, int tipo){
-        final Grupo novoGrupo = new Grupo(admin, getGrupoByName(nomeAntigo).instituicao, nomeNovo, tipo);
-        final String nomeVelho = nomeAntigo;
+    public Observable<Boolean> editarGrupo(final Grupo grupo, final String novoNome, final int tipo) {
 
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
-                CHAT.child("grupos").child(Utils.gerarHash(novoGrupo.admin) + "_" + nomeVelho)
-                        .setValue(novoGrupo)
+                CHAT.child("grupos").child(grupo.id)
+                        .setValue(new Grupo(mUsuario, grupo.instituicao, novoNome, tipo))
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void nada) {
@@ -367,15 +366,6 @@ public class ChatManager
                         });
             }
         });
-    }
-
-    public Grupo getGrupoByName(String nome) {
-        for(Grupo g: getGrupos()){
-            if(g.nome.equals(nome)){
-                return g;
-            }
-        }
-        return null;
     }
 
     @Override
@@ -384,8 +374,6 @@ public class ChatManager
             carregar(firebaseAuth.getCurrentUser());
         }
     }
-
-
 
     public interface ChatManagerListener {
 
@@ -417,10 +405,12 @@ public class ChatManager
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             Grupo grupo = dataSnapshot.getValue(Grupo.class);
+            String key = dataSnapshot.getKey();
             if (grupo != null && grupo.admin.equals(mUsuario.email)) {
-                if (!mGrupos.contains(grupo)) {
+                if (!mGrupos.containsKey(key)) {
                     Logger.d("Novo grupo: %s", grupo);
-                    mGrupos.add(grupo);
+                    grupo.id = key;
+                    mGrupos.put(key, grupo);
                     for (ChatManagerListener l : mListeners) l.novoGrupo(grupo);
                 }
             }
@@ -429,16 +419,22 @@ public class ChatManager
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
             Grupo grupo = dataSnapshot.getValue(Grupo.class);
-            if (grupo != null)
-                for (ChatManagerListener l : mListeners)
+            String key = dataSnapshot.getKey();
+            if (grupo != null && mGrupos.containsKey(key)) {
+                grupo.id = key;
+                mGrupos.put(key, grupo);
+                for (ChatManagerListener l : mListeners) {
                     l.grupoModificado(grupo);
+                }
+            }
         }
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
             Grupo grupo = dataSnapshot.getValue(Grupo.class);
+            String key = dataSnapshot.getKey();
             if (grupo != null) {
-                mGrupos.remove(grupo);
+                mGrupos.remove(key);
                 for (ChatManagerListener l : mListeners) l.grupoRemovido(grupo);
             }
         }
