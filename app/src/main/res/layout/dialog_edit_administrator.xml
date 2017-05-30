@@ -20,25 +20,26 @@
             android:paddingTop="20dp">
 
             <EditText
-                android:id="@+id/nomeEditable"
+                android:id="@+id/nomeGrupoEditable"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="10dp"
                 android:background="#FFF"
                 android:gravity="center"
-                android:hint="Nome"
+                android:hint="Nome do grupo"
+                android:enabled="false"
                 android:inputType="text"
                 android:textColorHint="#7000" />
 
             <EditText
-                android:id="@+id/instituicaoEditable"
+                android:id="@+id/administradorEditable"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
                 android:background="#FFF"
                 android:gravity="center"
-                android:hint="Instituição"
-                android:inputType="text"
+                android:hint="E-mail Administrador"
+                android:inputType="textEmailAddress"
                 android:textAllCaps="true"
                 android:textColorHint="#7000" />
 
@@ -49,20 +50,7 @@
                 android:layout_marginTop="20dp"
                 android:background="#3aaf4b"
                 android:gravity="center"
-                android:text="EDITAR"
-                android:textColor="#FFF"
-                android:textColorHint="#7000"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/deletarButton"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:background="#af3c3a"
-                android:gravity="center"
-                android:text="DELETAR"
+                android:text="EDITAR ADMINISTRADOR"
                 android:textColor="#FFF"
                 android:textColorHint="#7000"
                 android:textSize="18sp"
