@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import br.tiagohm.chatuniversidade.common.utils.Utils;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.model.entity.Usuario;
+import br.tiagohm.chatuniversidade.presentation.view.activity.HomeActivity;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -341,6 +342,42 @@ public class ChatManager
         });
     }
 
+    public Observable<Boolean> editarGrupo(Usuario admin, String nomeAntigo, String nomeNovo, int tipo){
+        final Grupo novoGrupo = new Grupo(admin, getGrupoByName(nomeAntigo).instituicao, nomeNovo, tipo);
+        final String nomeVelho = nomeAntigo;
+
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("grupos").child(Utils.gerarHash(novoGrupo.admin) + "_" + nomeVelho)
+                        .setValue(novoGrupo)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    public Grupo getGrupoByName(String nome) {
+        for(Grupo g: getGrupos()){
+            if(g.nome.equals(nome)){
+                return g;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         if (firebaseAuth.getCurrentUser() != null) {
@@ -348,11 +385,15 @@ public class ChatManager
         }
     }
 
+
+
     public interface ChatManagerListener {
 
         void novoGrupo(Grupo grupo);
 
         void grupoRemovido(Grupo grupo);
+
+        void grupoModificado(Grupo grupo);
     }
 
     public class UserValueEventListener implements ValueEventListener {
@@ -387,7 +428,10 @@ public class ChatManager
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+            Grupo grupo = dataSnapshot.getValue(Grupo.class);
+            if (grupo != null)
+                for (ChatManagerListener l : mListeners)
+                    l.grupoModificado(grupo);
         }
 
         @Override

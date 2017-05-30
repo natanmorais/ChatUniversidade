@@ -8,6 +8,7 @@ import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
 import br.tiagohm.chatuniversidade.presentation.view.activity.ContaActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.HomeActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.LoginActivity;
+import br.tiagohm.chatuniversidade.presentation.view.dialog.EditarGrupoDialog;
 import dagger.Component;
 
 @Singleton
@@ -23,4 +24,6 @@ public interface ChatComponent {
     void inject(ContaPresenter presenter);
 
     void inject(HomePresenter presenter);
+
+    void inject(EditarGrupoDialog dialog);
 }

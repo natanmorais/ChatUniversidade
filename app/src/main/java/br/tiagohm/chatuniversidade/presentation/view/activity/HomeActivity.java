@@ -28,6 +28,7 @@ import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.HomeContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.CriarGrupoDialog;
+import br.tiagohm.chatuniversidade.presentation.view.dialog.EditarGrupoDialog;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -131,6 +132,28 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                 });
     }
 
+    public void editarGrupo(String nome) {
+        final String nomeAntigo = nome;
+        final EditarGrupoDialog dialog = new EditarGrupoDialog(this);
+        dialog.exibir()
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean success) throws Exception {
+                        if(success){
+                            if (dialog.mNome.length() > 0) {
+                                presenter.editarGrupo(nomeAntigo, dialog.mNome.getText().toString());
+                            } else {
+                                Toast.makeText(HomeActivity.this, "Campos inválidos ou em branco", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                });
+    }
+
+    public void grupoModificado(Grupo g){
+        mMeusGrupos.getAdapter().notifyDataSetChanged();
+    }
+
     @Override
     public void showGrupos(List<Grupo> grupos) {
         //mMeusGrupos.getAdapter().notifyDataSetChanged();
@@ -174,7 +197,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
             @BindView(R.id.instituicaoDoGrupo)
             public TextView mInstituicaoDoGrupo;
 
-            public Holder(View itemView) {
+            public Holder(final View itemView) {
                 super(itemView);
                 mView = itemView;
 
@@ -183,8 +206,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Toast.makeText(HomeActivity.this, "Item Clicked", Toast.LENGTH_LONG).show();
-                        //Aparecer uma tela para editar ou apagar um grupo
+                        editarGrupo(mNomeDoGrupo.getText().toString());
                     }
                 });
             }

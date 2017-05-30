@@ -1,5 +1,7 @@
 package br.tiagohm.chatuniversidade.presentation.contract;
 
+import android.widget.EditText;
+
 import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
@@ -19,5 +21,7 @@ public interface HomeContract {
         void deslogar();
 
         void criarGrupo(String nome, String instituicao);
+
+        void editarGrupo(String nomeAntigo, String nomeNovo);
     }
 }
