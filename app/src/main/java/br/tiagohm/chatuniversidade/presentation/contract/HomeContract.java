@@ -23,5 +23,7 @@ public interface HomeContract {
         void criarGrupo(String nome, String instituicao);
 
         void editarGrupo(Grupo grupo, String nomeNovo);
+
+        void deletarGrupo(Grupo grupo);
     }
 }

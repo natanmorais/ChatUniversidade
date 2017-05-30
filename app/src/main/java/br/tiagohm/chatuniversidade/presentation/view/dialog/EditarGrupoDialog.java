@@ -27,6 +27,8 @@ public class EditarGrupoDialog extends AlertDialog.Builder {
     public EditText mNome;
     @BindView(R.id.editarButton)
     public Button mEditarButton;
+    @BindView(R.id.deletarButton)
+    public Button mDeletarButton;
     @Inject
     ChatManager chatManager;
 
@@ -49,14 +51,22 @@ public class EditarGrupoDialog extends AlertDialog.Builder {
         mInstituicao.setText(mGrupo.instituicao);
     }
 
-    public Observable<Boolean> exibir() {
-        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+    public Observable<Integer> exibir() {
+        return Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
-            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+            public void subscribe(final ObservableEmitter<Integer> e) throws Exception {
                 mEditarButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        e.onNext(true);
+                        e.onNext(1);
+                        e.onComplete();
+                        mDialog.dismiss();
+                    }
+                });
+                mDeletarButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        e.onNext(2);
                         e.onComplete();
                         mDialog.dismiss();
                     }

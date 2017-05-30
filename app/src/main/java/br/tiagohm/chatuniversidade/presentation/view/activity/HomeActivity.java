@@ -135,15 +135,17 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
     public void editarGrupo(final Grupo grupo) {
         final EditarGrupoDialog dialog = new EditarGrupoDialog(grupo, this);
         dialog.exibir()
-                .subscribe(new Consumer<Boolean>() {
+                .subscribe(new Consumer<Integer>() {
                     @Override
-                    public void accept(Boolean success) throws Exception {
-                        if (success) {
+                    public void accept(Integer opt) throws Exception {
+                        if (opt == 1) {
                             if (dialog.mNome.length() > 0) {
                                 presenter.editarGrupo(grupo, dialog.mNome.getText().toString());
                             } else {
                                 Toast.makeText(HomeActivity.this, "Campos inválidos ou em branco", Toast.LENGTH_SHORT).show();
                             }
+                        } else if (opt == 2) {
+                            presenter.deletarGrupo(grupo);
                         }
                     }
                 });
@@ -206,7 +208,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                 mView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        editarGrupo((Grupo)mView.getTag());
+                        editarGrupo((Grupo) mView.getTag());
                         return true;
                     }
                 });

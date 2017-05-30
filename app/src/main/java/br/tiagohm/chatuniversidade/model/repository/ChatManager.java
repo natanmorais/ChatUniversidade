@@ -376,6 +376,30 @@ public class ChatManager
         }
     }
 
+    public Observable<Boolean> deletarGrupo(final Grupo grupo) {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("grupos").child(grupo.id)
+                        .removeValue()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
     public interface ChatManagerListener {
 
         void novoGrupo(Grupo grupo);

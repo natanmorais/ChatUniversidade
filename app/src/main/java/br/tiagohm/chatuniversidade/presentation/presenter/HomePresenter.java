@@ -65,4 +65,22 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
                     }
                 });
     }
+
+    @Override
+    public void deletarGrupo(Grupo grupo) {
+        chatManager.deletarGrupo(grupo)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean success) throws Exception {
+                        if (success) {
+                            getView().showGrupos(chatManager.getGrupos());
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+
+                    }
+                });
+    }
 }
