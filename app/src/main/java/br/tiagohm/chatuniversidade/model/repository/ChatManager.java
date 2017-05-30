@@ -19,7 +19,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -216,8 +215,8 @@ public class ChatManager
         return mUsuario;
     }
 
-    public Collection<Grupo> getGrupos() {
-        return mGrupos.values();
+    public List<Grupo> getGrupos() {
+        return new ArrayList<>(mGrupos.values());
     }
 
     public Observable<Boolean> deletarConta() {
@@ -345,11 +344,13 @@ public class ChatManager
 
     public Observable<Boolean> editarGrupo(final Grupo grupo, final String novoNome, final int tipo) {
 
+        grupo.nome = novoNome;
+
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
                 CHAT.child("grupos").child(grupo.id)
-                        .setValue(new Grupo(mUsuario, grupo.instituicao, novoNome, tipo))
+                        .setValue(grupo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void nada) {

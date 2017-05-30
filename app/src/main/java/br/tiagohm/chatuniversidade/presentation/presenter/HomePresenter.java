@@ -5,6 +5,7 @@ import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import javax.inject.Inject;
 
 import br.tiagohm.chatuniversidade.common.App;
+import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.HomeContract;
 import io.reactivex.functions.Consumer;
@@ -46,9 +47,8 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
     }
 
     @Override
-    public void editarGrupo(String nomeAntigo, String nomeNovo) {
-        chatManager.editarGrupo(chatManager.getUsuario(),
-                nomeAntigo,
+    public void editarGrupo(Grupo grupo, String nomeNovo) {
+        chatManager.editarGrupo(grupo,
                 nomeNovo,
                 0)
                 .subscribe(new Consumer<Boolean>() {

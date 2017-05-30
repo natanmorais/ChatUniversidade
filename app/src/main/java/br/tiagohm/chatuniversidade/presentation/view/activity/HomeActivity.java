@@ -132,16 +132,15 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                 });
     }
 
-    public void editarGrupo(String nome) {
-        final String nomeAntigo = nome;
-        final EditarGrupoDialog dialog = new EditarGrupoDialog(this);
+    public void editarGrupo(final Grupo grupo) {
+        final EditarGrupoDialog dialog = new EditarGrupoDialog(grupo, this);
         dialog.exibir()
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
-                        if(success){
+                        if (success) {
                             if (dialog.mNome.length() > 0) {
-                                presenter.editarGrupo(nomeAntigo, dialog.mNome.getText().toString());
+                                presenter.editarGrupo(grupo, dialog.mNome.getText().toString());
                             } else {
                                 Toast.makeText(HomeActivity.this, "Campos inválidos ou em branco", Toast.LENGTH_SHORT).show();
                             }
@@ -150,7 +149,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                 });
     }
 
-    public void grupoModificado(Grupo g){
+    public void grupoModificado(Grupo g) {
         mMeusGrupos.getAdapter().notifyDataSetChanged();
     }
 
@@ -180,6 +179,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
         @Override
         public void onBindViewHolder(Holder holder, int position) {
             Grupo grupo = chatManager.getGrupos().get(position);
+            holder.mView.setTag(grupo);
             holder.mNomeDoGrupo.setText(grupo.nome);
             holder.mInstituicaoDoGrupo.setText(grupo.instituicao);
         }
@@ -203,10 +203,11 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
                 ButterKnife.bind(this, mView);
 
-                itemView.setOnClickListener(new View.OnClickListener() {
+                mView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
-                    public void onClick(View view) {
-                        editarGrupo(mNomeDoGrupo.getText().toString());
+                    public boolean onLongClick(View v) {
+                        editarGrupo((Grupo)mView.getTag());
+                        return true;
                     }
                 });
             }

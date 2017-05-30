@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 import br.tiagohm.chatuniversidade.R;
 import br.tiagohm.chatuniversidade.common.App;
+import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -18,9 +19,6 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 
-/**
- * Created by root on 29/05/17.
- */
 public class EditarGrupoDialog extends AlertDialog.Builder {
 
     @BindView(R.id.instituicaoEditable)
@@ -33,9 +31,12 @@ public class EditarGrupoDialog extends AlertDialog.Builder {
     ChatManager chatManager;
 
     private AlertDialog mDialog;
+    private Grupo mGrupo;
 
-    public EditarGrupoDialog(Context context) {
+    public EditarGrupoDialog(Grupo grupo, Context context) {
         super(context);
+
+        mGrupo = grupo;
 
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_edit_grupo, null, false);
         setView(view);
@@ -43,6 +44,9 @@ public class EditarGrupoDialog extends AlertDialog.Builder {
         ButterKnife.bind(this, view);
 
         App.getChatComponent().inject(this);
+
+        mNome.setText(mGrupo.nome);
+        mInstituicao.setText(mGrupo.instituicao);
     }
 
     public Observable<Boolean> exibir() {
