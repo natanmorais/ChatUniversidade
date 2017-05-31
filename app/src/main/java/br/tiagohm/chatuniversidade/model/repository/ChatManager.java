@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import br.tiagohm.chatuniversidade.common.utils.Utils;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
+import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -38,9 +39,11 @@ public class ChatManager
     //Eventos
     private final UserValueEventListener userValueEventListener = new UserValueEventListener();
     private final GroupChildEventListener groupChildEventListener = new GroupChildEventListener();
+    private final InstitutionChildEventListener institutionChildEventListener = new InstitutionChildEventListener();
     private Usuario mUsuario;
     private HashMap<String, Grupo> mGrupos = new HashMap<>();
     private List<ChatManagerListener> mListeners = new ArrayList<>();
+    private HashMap<String, Instituicao> mInstituicoes = new HashMap<>();
 
     public ChatManager() {
         FirebaseAuth.getInstance().addAuthStateListener(this);
@@ -200,6 +203,7 @@ public class ChatManager
                         CHAT.child("usuarios").child(Utils.gerarHash(getUsuario().email))
                                 .addValueEventListener(userValueEventListener);
                         CHAT.child("grupos").addChildEventListener(groupChildEventListener);
+                        CHAT.child("instituicoes").addChildEventListener(institutionChildEventListener);
                         Logger.d(getUsuario());
                     }
                 }, new Consumer<Throwable>() {
@@ -217,6 +221,10 @@ public class ChatManager
 
     public List<Grupo> getGrupos() {
         return new ArrayList<>(mGrupos.values());
+    }
+
+    public List<Instituicao> getInstituicoes() {
+        return new ArrayList<>(mInstituicoes.values());
     }
 
     public Observable<Boolean> deletarConta() {
@@ -369,13 +377,6 @@ public class ChatManager
         });
     }
 
-    @Override
-    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-        if (firebaseAuth.getCurrentUser() != null) {
-            carregar(firebaseAuth.getCurrentUser());
-        }
-    }
-
     public Observable<Boolean> deletarGrupo(final Grupo grupo) {
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
@@ -400,6 +401,90 @@ public class ChatManager
         });
     }
 
+    public Observable<Boolean> criarInstituicao(String sigla, String nome, String endereco, String telefone, String email) {
+        final Instituicao instituicao = new Instituicao(sigla, nome, endereco, telefone, email);
+
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                final String id = CHAT.child("instituicoes").push().getKey();
+                CHAT.child("instituicoes").child(id).setValue(instituicao)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Boolean> editarInstituicao(final String id, String sigla, String nome, String endereco, String telefone, String email) {
+
+        final Instituicao instituicao = new Instituicao(sigla, nome, endereco, telefone, email);
+
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("instituicoes").child(id)
+                        .setValue(instituicao)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Boolean> deletarInstituicao(final String id) {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("instituicoes").child(id)
+                        .removeValue()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        if (firebaseAuth.getCurrentUser() != null) {
+            carregar(firebaseAuth.getCurrentUser());
+        }
+    }
+
     public interface ChatManagerListener {
 
         void novoGrupo(Grupo grupo);
@@ -407,6 +492,12 @@ public class ChatManager
         void grupoRemovido(Grupo grupo);
 
         void grupoModificado(Grupo grupo);
+
+        void novaInstituicao(Instituicao instituicao);
+
+        void instituicaoModificada(Instituicao instituicao);
+
+        void instituicaoRemovida(Instituicao instituicao);
     }
 
     public class UserValueEventListener implements ValueEventListener {
@@ -461,6 +552,56 @@ public class ChatManager
             if (grupo != null) {
                 mGrupos.remove(key);
                 for (ChatManagerListener l : mListeners) l.grupoRemovido(grupo);
+            }
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    public class InstitutionChildEventListener implements ChildEventListener {
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            Instituicao instituicao = dataSnapshot.getValue(Instituicao.class);
+            String key = dataSnapshot.getKey();
+            if (instituicao != null) {
+                if (!mGrupos.containsKey(key)) {
+                    Logger.d("Nova Instituicao: %s", instituicao);
+                    instituicao.id = key;
+                    mInstituicoes.put(key, instituicao);
+                    for (ChatManagerListener l : mListeners) l.novaInstituicao(instituicao);
+                }
+            }
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            Instituicao instituicao = dataSnapshot.getValue(Instituicao.class);
+            String key = dataSnapshot.getKey();
+            if (instituicao != null) {
+                instituicao.id = key;
+                mInstituicoes.put(key, instituicao);
+                for (ChatManagerListener l : mListeners) {
+                    l.instituicaoModificada(instituicao);
+                }
+            }
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            Instituicao instituicao = dataSnapshot.getValue(Instituicao.class);
+            String key = dataSnapshot.getKey();
+            if (instituicao != null) {
+                mInstituicoes.remove(key);
+                for (ChatManagerListener l : mListeners) l.instituicaoRemovida(instituicao);
             }
         }
 

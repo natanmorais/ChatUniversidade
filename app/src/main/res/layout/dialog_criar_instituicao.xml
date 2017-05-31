@@ -20,15 +20,6 @@
             android:paddingTop="20dp">
 
             <TextView
-                android:id="@+id/instituicaoVoltarButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:text="FECHAR"
-                android:textColor="#4e81ed"
-                android:textSize="12sp" />
-
-            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -79,7 +70,7 @@
                 android:background="#FFF"
                 android:gravity="center"
                 android:hint="Telefone"
-                android:inputType="text"
+                android:inputType="phone"
                 android:textColorHint="#7000" />
 
             <EditText

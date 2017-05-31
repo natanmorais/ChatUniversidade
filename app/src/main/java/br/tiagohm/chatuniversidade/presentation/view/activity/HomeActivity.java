@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import br.tiagohm.chatuniversidade.R;
 import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
+import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.HomeContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
@@ -94,8 +95,12 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
         switch (id) {
             case R.id.verMinhaConta:
-                Intent i = new Intent(this, ContaActivity.class);
-                startActivity(i);
+                Intent a = new Intent(this, ContaActivity.class);
+                startActivity(a);
+                break;
+            case R.id.verInstituicoes:
+                Intent b = new Intent(this, InstituicoesActivity.class);
+                startActivity(b);
                 break;
         }
 
@@ -153,6 +158,21 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
     public void grupoModificado(Grupo g) {
         mMeusGrupos.getAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void novaInstituicao(Instituicao instituicao) {
+
+    }
+
+    @Override
+    public void instituicaoModificada(Instituicao instituicao) {
+
+    }
+
+    @Override
+    public void instituicaoRemovida(Instituicao instituicao) {
+
     }
 
     @Override

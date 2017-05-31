@@ -36,6 +36,7 @@
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
                 android:background="#FFF"
+                android:enabled="false"
                 android:gravity="center"
                 android:hint="Instituição"
                 android:inputType="text"
