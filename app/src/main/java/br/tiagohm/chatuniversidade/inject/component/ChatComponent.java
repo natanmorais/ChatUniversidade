@@ -3,6 +3,7 @@ package br.tiagohm.chatuniversidade.inject.component;
 import javax.inject.Singleton;
 
 import br.tiagohm.chatuniversidade.inject.module.ChatModule;
+import br.tiagohm.chatuniversidade.presentation.presenter.AulaPresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.ContaPresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.InstuticoesPresenter;
@@ -32,4 +33,6 @@ public interface ChatComponent {
     void inject(InstituicoesActivity activity);
 
     void inject(InstuticoesPresenter presenter);
+
+    void inject(AulaPresenter presenter);
 }

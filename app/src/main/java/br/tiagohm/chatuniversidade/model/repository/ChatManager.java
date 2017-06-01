@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import br.tiagohm.chatuniversidade.common.utils.Utils;
+import br.tiagohm.chatuniversidade.model.entity.Aula;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.entity.Usuario;
@@ -459,6 +460,83 @@ public class ChatManager
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
                 CHAT.child("instituicoes").child(id)
+                        .removeValue()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Boolean> criarAula(String titulo, String conteudo) {
+        final Aula aula = new Aula(titulo, conteudo);
+
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                final String id = CHAT.child("aulas").push().getKey();
+                CHAT.child("aulas").child(id).setValue(aula)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Boolean> editarAula(final String id, String titulo, String conteudo) {
+
+        final Aula aula = new Aula(titulo, conteudo);
+
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("aulas").child(id)
+                        .setValue(aula)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Boolean> deletarAula(final String id) {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("aulas").child(id)
                         .removeValue()
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
