@@ -24,10 +24,12 @@ import javax.inject.Inject;
 import br.tiagohm.chatuniversidade.R;
 import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
+import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.HomeContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.CriarGrupoDialog;
+import br.tiagohm.chatuniversidade.presentation.view.dialog.EditarGrupoDialog;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -47,6 +49,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        setTitle("Meus Grupos");
 
         ButterKnife.bind(this);
 
@@ -93,8 +96,12 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
         switch (id) {
             case R.id.verMinhaConta:
-                Intent i = new Intent(this, ContaActivity.class);
-                startActivity(i);
+                Intent a = new Intent(this, ContaActivity.class);
+                startActivity(a);
+                break;
+            case R.id.verInstituicoes:
+                Intent b = new Intent(this, InstituicoesActivity.class);
+                startActivity(b);
                 break;
         }
 
@@ -131,6 +138,44 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                 });
     }
 
+    public void editarGrupo(final Grupo grupo) {
+        final EditarGrupoDialog dialog = new EditarGrupoDialog(grupo, this);
+        dialog.exibir()
+                .subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer opt) throws Exception {
+                        if (opt == 1) {
+                            if (dialog.mNome.length() > 0) {
+                                presenter.editarGrupo(grupo, dialog.mNome.getText().toString());
+                            } else {
+                                Toast.makeText(HomeActivity.this, "Campos inválidos ou em branco", Toast.LENGTH_SHORT).show();
+                            }
+                        } else if (opt == 2) {
+                            presenter.deletarGrupo(grupo);
+                        }
+                    }
+                });
+    }
+
+    public void grupoModificado(Grupo g) {
+        mMeusGrupos.getAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void novaInstituicao(Instituicao instituicao) {
+
+    }
+
+    @Override
+    public void instituicaoModificada(Instituicao instituicao) {
+
+    }
+
+    @Override
+    public void instituicaoRemovida(Instituicao instituicao) {
+
+    }
+
     @Override
     public void showGrupos(List<Grupo> grupos) {
         //mMeusGrupos.getAdapter().notifyDataSetChanged();
@@ -157,6 +202,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
         @Override
         public void onBindViewHolder(Holder holder, int position) {
             Grupo grupo = chatManager.getGrupos().get(position);
+            holder.mView.setTag(grupo);
             holder.mNomeDoGrupo.setText(grupo.nome);
             holder.mInstituicaoDoGrupo.setText(grupo.instituicao);
         }
@@ -174,11 +220,28 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
             @BindView(R.id.instituicaoDoGrupo)
             public TextView mInstituicaoDoGrupo;
 
-            public Holder(View itemView) {
+            public Holder(final View itemView) {
                 super(itemView);
                 mView = itemView;
 
                 ButterKnife.bind(this, mView);
+
+                mView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        editarGrupo((Grupo) mView.getTag());
+                        return true;
+                    }
+                });
+
+                mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(HomeActivity.this, GrupoActivity.class);
+                        i.putExtra("GRUPO", ((Grupo) mView.getTag()).id);
+                        startActivity(i);
+                    }
+                });
             }
         }
     }

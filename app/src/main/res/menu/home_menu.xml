@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/verInstituicoes"
+        android:icon="@drawable/institution"
+        android:title="Instituições"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/verMinhaConta"
         android:icon="@drawable/user"
         android:title="MinhaConta"

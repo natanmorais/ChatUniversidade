@@ -3,11 +3,18 @@ package br.tiagohm.chatuniversidade.inject.component;
 import javax.inject.Singleton;
 
 import br.tiagohm.chatuniversidade.inject.module.ChatModule;
+import br.tiagohm.chatuniversidade.presentation.presenter.AulasPresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.ContaPresenter;
+import br.tiagohm.chatuniversidade.presentation.presenter.GrupoPresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
+import br.tiagohm.chatuniversidade.presentation.presenter.InstuticoesPresenter;
+import br.tiagohm.chatuniversidade.presentation.view.activity.AulasActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.ContaActivity;
+import br.tiagohm.chatuniversidade.presentation.view.activity.GrupoActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.HomeActivity;
+import br.tiagohm.chatuniversidade.presentation.view.activity.InstituicoesActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.LoginActivity;
+import br.tiagohm.chatuniversidade.presentation.view.dialog.EditarGrupoDialog;
 import dagger.Component;
 
 @Singleton
@@ -23,4 +30,18 @@ public interface ChatComponent {
     void inject(ContaPresenter presenter);
 
     void inject(HomePresenter presenter);
+
+    void inject(EditarGrupoDialog dialog);
+
+    void inject(InstituicoesActivity activity);
+
+    void inject(InstuticoesPresenter presenter);
+
+    void inject(AulasPresenter presenter);
+
+    void inject(GrupoActivity activity);
+
+    void inject(GrupoPresenter presenter);
+
+    void inject(AulasActivity activity);
 }

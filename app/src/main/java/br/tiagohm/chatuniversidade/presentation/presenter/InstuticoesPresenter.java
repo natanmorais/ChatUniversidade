@@ -5,38 +5,27 @@ import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import javax.inject.Inject;
 
 import br.tiagohm.chatuniversidade.common.App;
-import br.tiagohm.chatuniversidade.model.entity.Grupo;
+import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
-import br.tiagohm.chatuniversidade.presentation.contract.HomeContract;
+import br.tiagohm.chatuniversidade.presentation.contract.InstuticaoContract;
 import io.reactivex.functions.Consumer;
 
-public class HomePresenter extends MvpBasePresenter<HomeContract.View>
-        implements HomeContract.Presenter {
+public class InstuticoesPresenter extends MvpBasePresenter<InstuticaoContract.View>
+        implements InstuticaoContract.Presenter {
 
     @Inject
     ChatManager chatManager;
 
-    public HomePresenter() {
+    public InstuticoesPresenter() {
         App.getChatComponent().inject(this);
     }
 
     @Override
-    public void deslogar() {
-        ChatManager.deslogar();
-    }
-
-    @Override
-    public void criarGrupo(String nome, String instituicao) {
-        chatManager.criarGrupo(chatManager.getUsuario(),
-                instituicao,
-                nome,
-                0)
+    public void novaInstituicao(String sigla, String nome, String endereco, String telefone, String email) {
+        chatManager.criarInstituicao(sigla, nome, endereco, telefone, email)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
-                        if (success) {
-                            getView().showGrupos(chatManager.getGrupos());
-                        }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -47,16 +36,11 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
     }
 
     @Override
-    public void editarGrupo(Grupo grupo, String nomeNovo) {
-        chatManager.editarGrupo(grupo,
-                nomeNovo,
-                0)
+    public void editarInstituicao(String id, String sigla, String nome, String endereco, String telefone, String email) {
+        chatManager.editarInstituicao(id, sigla, nome, endereco, telefone, email)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
-                        if (success) {
-                            getView().showGrupos(chatManager.getGrupos());
-                        }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -67,14 +51,11 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
     }
 
     @Override
-    public void deletarGrupo(Grupo grupo) {
-        chatManager.deletarGrupo(grupo)
+    public void removerInstituicao(Instituicao instituicao) {
+        chatManager.deletarInstituicao(instituicao.id)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
-                        if (success) {
-                            getView().showGrupos(chatManager.getGrupos());
-                        }
                     }
                 }, new Consumer<Throwable>() {
                     @Override

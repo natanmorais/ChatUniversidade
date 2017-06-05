@@ -1,11 +1,14 @@
 package br.tiagohm.chatuniversidade.model.entity;
 
+import com.google.firebase.database.Exclude;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
 public class Grupo implements Serializable {
 
+    @Exclude
+    public transient String id;
     @SerializedName("admin")
     public String admin;
     @SerializedName("instituicao")
