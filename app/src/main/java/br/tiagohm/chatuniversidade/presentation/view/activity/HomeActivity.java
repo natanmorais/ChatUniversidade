@@ -49,6 +49,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        setTitle("Meus Grupos");
 
         ButterKnife.bind(this);
 
@@ -230,6 +231,15 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                     public boolean onLongClick(View v) {
                         editarGrupo((Grupo) mView.getTag());
                         return true;
+                    }
+                });
+
+                mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(HomeActivity.this, GrupoActivity.class);
+                        i.putExtra("GRUPO", ((Grupo) mView.getTag()).id);
+                        startActivity(i);
                     }
                 });
             }

@@ -20,7 +20,7 @@
             android:paddingTop="20dp">
 
             <EditText
-                android:id="@+id/tituloEditable"
+                android:id="@+id/tituloInput"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="10dp"
@@ -31,12 +31,11 @@
                 android:textColorHint="#7000" />
 
             <EditText
-                android:id="@+id/conteudoEditable"
+                android:id="@+id/conteudoInput"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:layout_marginTop="20dp"
                 android:background="#FFF"
-                android:enabled="false"
                 android:gravity="center"
                 android:hint="Conteúdo da Aula"
                 android:inputType="text"

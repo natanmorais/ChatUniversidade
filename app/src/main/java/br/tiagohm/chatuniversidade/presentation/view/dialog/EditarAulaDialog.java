@@ -15,16 +15,13 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 
-/**
- * Created by root on 01/06/17.
- */
 public class EditarAulaDialog extends AlertDialog.Builder {
 
-    @BindView(R.id.tituloEditable)
+    @BindView(R.id.tituloInput)
     public EditText mTitulo;
-    @BindView(R.id.conteudoEditable)
+    @BindView(R.id.conteudoInput)
     public EditText mConteudo;
-    @BindView(R.id.salvarButton)
+    @BindView(R.id.editarButton)
     public Button mSalvarButton;
     @BindView(R.id.deletarButton)
     public Button mDeletarButton;
@@ -41,11 +38,9 @@ public class EditarAulaDialog extends AlertDialog.Builder {
 
         mTitulo.setText(aula.titulo);
         mConteudo.setText(aula.conteudo);
-
-        ButterKnife.bind(this, view);
     }
 
-    public Aula getInstituicao() {
+    public Aula getAula() {
         return new Aula(
                 mTitulo.getText().toString(),
                 mConteudo.getText().toString());

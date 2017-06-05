@@ -479,25 +479,30 @@ public class ChatManager
         });
     }
 
-    public Observable<Boolean> criarAula(String titulo, String conteudo) {
-        final Aula aula = new Aula(titulo, conteudo);
+    public Observable<List<Aula>> verAulas(final String grupoId) {
 
-        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+        return Observable.create(new ObservableOnSubscribe<List<Aula>>() {
             @Override
-            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
-                final String id = CHAT.child("aulas").push().getKey();
-                CHAT.child("aulas").child(id).setValue(aula)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+            public void subscribe(final ObservableEmitter<List<Aula>> e) throws Exception {
+                CHAT.child("grupos").child(grupoId).child("aulas")
+                        .addValueEventListener(new ValueEventListener() {
                             @Override
-                            public void onSuccess(Void nada) {
-                                e.onNext(true);
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                List<Aula> aulas = new ArrayList<>((int) dataSnapshot.getChildrenCount());
+                                for (DataSnapshot aulaSnapshot : dataSnapshot.getChildren()) {
+                                    Aula aula = aulaSnapshot.getValue(Aula.class);
+                                    if (aula != null) {
+                                        aula.id = aulaSnapshot.getKey();
+                                        aulas.add(aula);
+                                    }
+                                }
+                                e.onNext(aulas);
                                 e.onComplete();
                             }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
+
                             @Override
-                            public void onFailure(@NonNull Exception ex) {
-                                e.onError(ex);
+                            public void onCancelled(DatabaseError databaseError) {
+                                e.onError(databaseError.toException());
                                 e.onComplete();
                             }
                         });
@@ -505,14 +510,14 @@ public class ChatManager
         });
     }
 
-    public Observable<Boolean> editarAula(final String id, String titulo, String conteudo) {
-
+    public Observable<Boolean> criarAula(final String grupoId, String titulo, String conteudo) {
         final Aula aula = new Aula(titulo, conteudo);
 
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
-                CHAT.child("aulas").child(id)
+                final String id = CHAT.child("grupos").child(grupoId).child("aulas").push().getKey();
+                CHAT.child("grupos").child(grupoId).child("aulas").child(id)
                         .setValue(aula)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -532,11 +537,37 @@ public class ChatManager
         });
     }
 
-    public Observable<Boolean> deletarAula(final String id) {
+    public Observable<Boolean> editarAula(final String grupoId, final String id, String titulo, String conteudo) {
+        final Aula aula = new Aula(titulo, conteudo);
+
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
-                CHAT.child("aulas").child(id)
+                CHAT.child("grupos").child(grupoId).child("aulas").child(id)
+                        .setValue(aula)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Boolean> deletarAula(final String grupoId, final String id) {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("grupos").child(grupoId).child("aulas").child(id)
                         .removeValue()
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override

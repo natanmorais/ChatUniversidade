@@ -14,9 +14,6 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 
-/**
- * Created by root on 01/06/17.
- */
 public class CriarAulaDialog extends AlertDialog.Builder {
     @BindView(R.id.tituloInput)
     public EditText mTitulo;
@@ -27,7 +24,7 @@ public class CriarAulaDialog extends AlertDialog.Builder {
 
     private AlertDialog mDialog;
 
-    public CriarAulaDialog (Context context) {
+    public CriarAulaDialog(Context context) {
         super(context);
 
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_criar_aula, null, false);

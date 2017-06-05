@@ -38,6 +38,7 @@ dependencies {
     compile 'com.lapism:searchview:4.0'
     compile 'com.rom4ek:arcnavigationview:1.0.3'
     compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile 'com.github.tiagohm.MarkdownView:library:0.16.0'
     //Dagger
     compile 'com.google.dagger:dagger:2.10'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.10'

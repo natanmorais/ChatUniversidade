@@ -3,9 +3,6 @@ package br.tiagohm.chatuniversidade.model.entity;
 import com.google.firebase.database.Exclude;
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by root on 01/06/17.
- */
 public class Aula {
 
     @Exclude
@@ -14,10 +11,14 @@ public class Aula {
     public String titulo;
     @SerializedName("conteudo")
     public String conteudo;
+    @SerializedName("data")
+    public long data;
 
-    public Aula() {}
+    public Aula() {
+    }
 
     public Aula(String titulo, String conteudo) {
+        this.data = System.currentTimeMillis();
         this.titulo = titulo;
         this.conteudo = conteudo;
     }
