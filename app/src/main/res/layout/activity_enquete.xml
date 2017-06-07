@@ -1,67 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#EEE">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/minhasEnquetes"
         android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/novaAula"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:paddingBottom="20dp"
-        android:paddingTop="20dp">
-
-        <EditText
-            android:id="@+id/tituloInput"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:background="#FFF"
-            android:gravity="center"
-            android:hint="Titulo da Enquete"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:inputType="text"
-            android:textColorHint="#7000" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/opcoes"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"/>
-
-        <ImageButton
-            android:id="@+id/anexoButton"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:background="#3aaf4b"
-            android:src="@drawable/plus"
-            android:textColor="#FFF"
-            android:textColorHint="#7000"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/criarButton"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="20dp"
-            android:background="#3aaf4b"
-            android:gravity="center"
-            android:text="CRIAR"
-            android:textColor="#FFF"
-            android:textColorHint="#7000"
-            android:textSize="18sp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:textStyle="bold" />
-
-    </LinearLayout>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/plus"
+        android:layout_margin="10dp" />
 
 </RelativeLayout>
