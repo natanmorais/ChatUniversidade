@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="top|center"
     android:background="#EEE"
     android:orientation="vertical">
 
+    <com.stfalcon.chatkit.messages.MessagesList
+        android:id="@+id/conversas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true" />
+
+    <com.stfalcon.chatkit.messages.MessageInput
+        android:id="@+id/textoMensagem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/conversas"
+        android:layout_alignParentBottom="true"
+        app:inputHint="Escreva aqui..."
+        app:showAttachmentButton="true" />
 </RelativeLayout>
