@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import br.tiagohm.chatuniversidade.common.utils.Utils;
 import br.tiagohm.chatuniversidade.model.entity.Aula;
 import br.tiagohm.chatuniversidade.model.entity.Conversa;
+import br.tiagohm.chatuniversidade.model.entity.Convite;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.entity.Usuario;
@@ -719,6 +720,57 @@ public class ChatManager
                             public void onFailure(@NonNull Exception ex) {
                                 ex.printStackTrace();
                                 e.onNext(false);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Boolean> criarConvite(String nomeGrupo, Usuario remetente, String destinatario) {
+        final Convite convite = new Convite(nomeGrupo,remetente,destinatario);
+
+        return Observable.create(new ObservableOnSubscribe<java.lang.Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<java.lang.Boolean> e) throws Exception {
+                final String id = CHAT.child("convites").push().getKey();
+                CHAT.child("convites").child(id)
+                        .setValue(convite)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Boolean> deletarConvite(final Convite convite) {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("convites").child(convite.id)
+                        .removeValue()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
                                 e.onComplete();
                             }
                         });
