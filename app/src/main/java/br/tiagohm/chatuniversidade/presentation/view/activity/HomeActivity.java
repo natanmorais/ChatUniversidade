@@ -17,12 +17,10 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import br.tiagohm.chatuniversidade.R;
-import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
@@ -38,12 +36,12 @@ import io.reactivex.functions.Consumer;
 public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Presenter>
         implements HomeContract.View, FirebaseAuth.AuthStateListener, ChatManager.ChatManagerListener {
 
-    @Inject
-    ChatManager chatManager;
     @BindView(R.id.novoGrupo)
     FloatingActionButton mCriarGrupoButton;
     @BindView(R.id.meusGrupos)
     RecyclerView mMeusGrupos;
+
+    private List<Grupo> grupos = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +51,6 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
         ButterKnife.bind(this);
 
-        App.getChatComponent().inject(this);
-
         mMeusGrupos.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -62,20 +58,20 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
     protected void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(this);
-        chatManager.add(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         FirebaseAuth.getInstance().removeAuthStateListener(this);
-        chatManager.remove(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         mMeusGrupos.setAdapter(new GruposAdapter());
+        presenter.monitorarMeusGrupos();
     }
 
     @NonNull
@@ -146,19 +142,15 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                     public void accept(Integer opt) throws Exception {
                         if (opt == 1) {
                             if (dialog.mNome.length() > 0) {
-                                presenter.editarGrupo(grupo, dialog.mNome.getText().toString());
+                                presenter.editarGrupo(grupo.id, dialog.mNome.getText().toString());
                             } else {
                                 Toast.makeText(HomeActivity.this, "Campos inválidos ou em branco", Toast.LENGTH_SHORT).show();
                             }
                         } else if (opt == 2) {
-                            presenter.deletarGrupo(grupo);
+                            presenter.deletarGrupo(grupo.id);
                         }
                     }
                 });
-    }
-
-    public void grupoModificado(Grupo g) {
-        mMeusGrupos.getAdapter().notifyDataSetChanged();
     }
 
     @Override
@@ -177,18 +169,31 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
     }
 
     @Override
-    public void showGrupos(List<Grupo> grupos) {
-        //mMeusGrupos.getAdapter().notifyDataSetChanged();
+    public void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void novoGrupo(Grupo grupo) {
+    public void adicionarGrupo(Grupo grupo) {
+        grupos.add(grupo);
         mMeusGrupos.getAdapter().notifyDataSetChanged();
     }
 
     @Override
-    public void grupoRemovido(Grupo grupo) {
+    public void removerGrupo(Grupo grupo) {
+        grupos.remove(grupo);
         mMeusGrupos.getAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void atualizarGrupo(Grupo grupo) {
+        for (int i = 0; i < grupos.size(); i++) {
+            if (grupos.get(i).id.equals(grupo.id)) {
+                grupos.set(i, grupo);
+                mMeusGrupos.getAdapter().notifyDataSetChanged();
+                return;
+            }
+        }
     }
 
     public class GruposAdapter extends RecyclerView.Adapter<GruposAdapter.Holder> {
@@ -201,7 +206,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
         @Override
         public void onBindViewHolder(Holder holder, int position) {
-            Grupo grupo = chatManager.getGrupos().get(position);
+            Grupo grupo = grupos.get(position);
             holder.mView.setTag(grupo);
             holder.mNomeDoGrupo.setText(grupo.nome);
             holder.mInstituicaoDoGrupo.setText(grupo.instituicao);
@@ -209,7 +214,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
         @Override
         public int getItemCount() {
-            return chatManager.getGrupos().size();
+            return grupos.size();
         }
 
         public class Holder extends RecyclerView.ViewHolder {

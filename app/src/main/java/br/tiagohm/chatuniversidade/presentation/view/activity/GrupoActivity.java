@@ -8,23 +8,27 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
-
-import javax.inject.Inject;
+import com.stfalcon.chatkit.messages.MessageInput;
+import com.stfalcon.chatkit.messages.MessagesList;
+import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
 import br.tiagohm.chatuniversidade.R;
-import br.tiagohm.chatuniversidade.common.App;
-import br.tiagohm.chatuniversidade.model.repository.ChatManager;
+import br.tiagohm.chatuniversidade.model.entity.Conversa;
 import br.tiagohm.chatuniversidade.presentation.contract.GrupoContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.GrupoPresenter;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class GrupoActivity extends MvpActivity<GrupoContract.View, GrupoContract.Presenter>
         implements GrupoContract.View {
 
-    @Inject
-    ChatManager chatManager;
+    @BindView(R.id.conversas)
+    MessagesList mConversas;
+    @BindView(R.id.textoMensagem)
+    MessageInput mTextoMensagem;
 
-    private String mGrupo;
+    private String mGrupoId;
+    private MessageAdapter mMessageAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +38,13 @@ public class GrupoActivity extends MvpActivity<GrupoContract.View, GrupoContract
 
         ButterKnife.bind(this);
 
-        App.getChatComponent().inject(this);
+        mTextoMensagem.setInputListener(new MessageInput.InputListener() {
+            @Override
+            public boolean onSubmit(CharSequence mensagem) {
+                presenter.enviarConversa(mGrupoId, mensagem.toString());
+                return true;
+            }
+        });
     }
 
     @Override
@@ -42,12 +52,16 @@ public class GrupoActivity extends MvpActivity<GrupoContract.View, GrupoContract
         super.onResume();
 
         if (getIntent() != null && getIntent().hasExtra("GRUPO")) {
-            mGrupo = (String) getIntent().getSerializableExtra("GRUPO");
+            mGrupoId = (String) getIntent().getSerializableExtra("GRUPO");
         }
 
-        if (mGrupo == null) {
+        if (mGrupoId == null) {
             finish();
         }
+
+        mMessageAdapter = new MessageAdapter();
+        mConversas.setAdapter(mMessageAdapter);
+        presenter.monitorarConversas(mGrupoId);
     }
 
     @NonNull
@@ -73,10 +87,27 @@ public class GrupoActivity extends MvpActivity<GrupoContract.View, GrupoContract
 
         if (id == R.id.verAulas) {
             Intent i = new Intent(this, AulasActivity.class);
-            i.putExtra("GRUPO", mGrupo);
+            i.putExtra("GRUPO", mGrupoId);
             startActivity(i);
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void adicionarConversa(Conversa conversa) {
+        mMessageAdapter.addToStart(conversa, true);
+    }
+
+    @Override
+    public void removerConversa(Conversa conversa) {
+        mMessageAdapter.delete(conversa);
+    }
+
+    private class MessageAdapter extends MessagesListAdapter<Conversa> {
+
+        public MessageAdapter() {
+            super(presenter.getUsuario().getId(), null);
+        }
     }
 }

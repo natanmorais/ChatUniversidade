@@ -4,25 +4,31 @@ import com.google.firebase.database.Exclude;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Grupo implements Serializable {
 
     @Exclude
     public transient String id;
     @SerializedName("admin")
-    public String admin;
+    public Usuario admin;
     @SerializedName("instituicao")
     public String instituicao;
     @SerializedName("nome")
     public String nome;
     @SerializedName("tipo")
     public int tipo;
+    @SerializedName("conversas")
+    public List<Conversa> conversas = new ArrayList<>(0);
+    @SerializedName("usuarios")
+    public List<Usuario> usuarios = new ArrayList<>(0);
 
     public Grupo() {
     }
 
     public Grupo(Usuario admin, String instituicao, String nome, int tipo) {
-        this.admin = admin.email;
+        this.admin = admin;
         this.instituicao = instituicao;
         this.nome = nome;
         this.tipo = tipo;

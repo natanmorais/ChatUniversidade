@@ -23,8 +23,6 @@ public interface ChatComponent {
 
     void inject(ContaActivity activity);
 
-    void inject(HomeActivity activity);
-
     void inject(LoginActivity activity);
 
     void inject(ContaPresenter presenter);
@@ -38,8 +36,6 @@ public interface ChatComponent {
     void inject(InstuticoesPresenter presenter);
 
     void inject(AulasPresenter presenter);
-
-    void inject(GrupoActivity activity);
 
     void inject(GrupoPresenter presenter);
 

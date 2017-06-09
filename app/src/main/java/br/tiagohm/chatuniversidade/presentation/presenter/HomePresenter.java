@@ -1,5 +1,7 @@
 package br.tiagohm.chatuniversidade.presentation.presenter;
 
+import android.util.Pair;
+
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
 import javax.inject.Inject;
@@ -26,6 +28,28 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
     }
 
     @Override
+    public void monitorarMeusGrupos() {
+        chatManager.monitorarGruposDoUsuario(chatManager.getUsuario().getId())
+                .subscribe(new Consumer<Pair<Integer, Grupo>>() {
+                    @Override
+                    public void accept(Pair<Integer, Grupo> grupo) throws Exception {
+                        //Added
+                        if (grupo.first == 0) {
+                            getView().adicionarGrupo(grupo.second);
+                        }
+                        //Changed.
+                        else if (grupo.first == 1) {
+                            //Conversas nao podem ser modificadas.
+                        }
+                        //Removed
+                        else if (grupo.first == 2) {
+                            getView().removerGrupo(grupo.second);
+                        }
+                    }
+                });
+    }
+
+    @Override
     public void criarGrupo(String nome, String instituicao) {
         chatManager.criarGrupo(chatManager.getUsuario(),
                 instituicao,
@@ -34,52 +58,37 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
-                        if (success) {
-                            getView().showGrupos(chatManager.getGrupos());
+                        if (!success) {
+                            getView().showMessage("Erro ao criar o grupo!!!");
                         }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-
                     }
                 });
     }
 
     @Override
-    public void editarGrupo(Grupo grupo, String nomeNovo) {
-        chatManager.editarGrupo(grupo,
+    public void editarGrupo(String grupoId, String nomeNovo) {
+        chatManager.editarGrupo(grupoId,
                 nomeNovo,
                 0)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
-                        if (success) {
-                            getView().showGrupos(chatManager.getGrupos());
+                        if (!success) {
+                            getView().showMessage("Erro ao editar o grupo!!!");
                         }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-
                     }
                 });
     }
 
     @Override
-    public void deletarGrupo(Grupo grupo) {
-        chatManager.deletarGrupo(grupo)
+    public void deletarGrupo(String grupoId) {
+        chatManager.deletarGrupo(grupoId)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
-                        if (success) {
-                            getView().showGrupos(chatManager.getGrupos());
+                        if (!success) {
+                            getView().showMessage("Erro ao remover o grupo!!!");
                         }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-
                     }
                 });
     }

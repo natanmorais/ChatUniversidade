@@ -82,21 +82,6 @@ public class InstituicoesActivity extends MvpActivity<InstuticaoContract.View, I
     }
 
     @Override
-    public void novoGrupo(Grupo grupo) {
-
-    }
-
-    @Override
-    public void grupoRemovido(Grupo grupo) {
-
-    }
-
-    @Override
-    public void grupoModificado(Grupo grupo) {
-
-    }
-
-    @Override
     public void novaInstituicao(Instituicao instituicao) {
         updateList();
     }

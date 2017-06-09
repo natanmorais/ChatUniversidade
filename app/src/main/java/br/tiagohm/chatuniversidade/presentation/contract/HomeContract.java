@@ -13,7 +13,13 @@ public interface HomeContract {
 
     interface View extends MvpView {
 
-        void showGrupos(List<Grupo> grupos);
+        void adicionarGrupo(Grupo grupo);
+
+        void removerGrupo(Grupo grupo);
+
+        void atualizarGrupo(Grupo grupo);
+
+        void showMessage(String message);
     }
 
     interface Presenter extends MvpPresenter<View> {
@@ -22,8 +28,10 @@ public interface HomeContract {
 
         void criarGrupo(String nome, String instituicao);
 
-        void editarGrupo(Grupo grupo, String nomeNovo);
+        void editarGrupo(String grupoId, String nomeNovo);
 
-        void deletarGrupo(Grupo grupo);
+        void deletarGrupo(String grupoId);
+
+        void monitorarMeusGrupos();
     }
 }

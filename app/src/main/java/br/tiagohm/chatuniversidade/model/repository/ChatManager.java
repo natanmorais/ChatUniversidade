@@ -1,6 +1,7 @@
 package br.tiagohm.chatuniversidade.model.repository;
 
 import android.support.annotation.NonNull;
+import android.util.Pair;
 import android.util.Patterns;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -25,6 +26,7 @@ import java.util.regex.Pattern;
 
 import br.tiagohm.chatuniversidade.common.utils.Utils;
 import br.tiagohm.chatuniversidade.model.entity.Aula;
+import br.tiagohm.chatuniversidade.model.entity.Conversa;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.entity.Usuario;
@@ -39,7 +41,6 @@ public class ChatManager
     private static final DatabaseReference CHAT = FirebaseDatabase.getInstance().getReference().child("chat");
     //Eventos
     private final UserValueEventListener userValueEventListener = new UserValueEventListener();
-    private final GroupChildEventListener groupChildEventListener = new GroupChildEventListener();
     private final InstitutionChildEventListener institutionChildEventListener = new InstitutionChildEventListener();
     private Usuario mUsuario;
     private HashMap<String, Grupo> mGrupos = new HashMap<>();
@@ -168,7 +169,6 @@ public class ChatManager
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                Logger.d("getUsuarioByEmail() = %b", dataSnapshot.exists());
                                 e.onNext(dataSnapshot.getValue(Usuario.class));
                                 e.onComplete();
                             }
@@ -194,7 +194,6 @@ public class ChatManager
         mListeners.remove(listener);
     }
 
-    //TODO Carregar está aqui!!!
     private void carregar(FirebaseUser user) {
         getUsuarioByEmail(user.getEmail())
                 .subscribe(new Consumer<Usuario>() {
@@ -203,7 +202,6 @@ public class ChatManager
                         mUsuario = usuario;
                         CHAT.child("usuarios").child(Utils.gerarHash(getUsuario().email))
                                 .addValueEventListener(userValueEventListener);
-                        CHAT.child("grupos").addChildEventListener(groupChildEventListener);
                         CHAT.child("instituicoes").addChildEventListener(institutionChildEventListener);
                         Logger.d(getUsuario());
                     }
@@ -343,7 +341,8 @@ public class ChatManager
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception ex) {
-                                e.onError(ex);
+                                ex.printStackTrace();
+                                e.onNext(false);
                                 e.onComplete();
                             }
                         });
@@ -351,15 +350,13 @@ public class ChatManager
         });
     }
 
-    public Observable<Boolean> editarGrupo(final Grupo grupo, final String novoNome, final int tipo) {
-
-        grupo.nome = novoNome;
-
+    public Observable<Boolean> novoUsuarioDoGrupo(final String grupoId, final Usuario usuario) {
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
-                CHAT.child("grupos").child(grupo.id)
-                        .setValue(grupo)
+                final String id = CHAT.child("grupos").child(grupoId).child("usuarios").push().getKey();
+                CHAT.child("grupos").child(grupoId).child("usuarios")
+                        .setValue(usuario)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void nada) {
@@ -370,7 +367,8 @@ public class ChatManager
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception ex) {
-                                e.onError(ex);
+                                ex.printStackTrace();
+                                e.onNext(false);
                                 e.onComplete();
                             }
                         });
@@ -378,11 +376,37 @@ public class ChatManager
         });
     }
 
-    public Observable<Boolean> deletarGrupo(final Grupo grupo) {
+    public Observable<Boolean> editarGrupo(final String grupoId, final String novoNome, final int tipo) {
+
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
-                CHAT.child("grupos").child(grupo.id)
+                CHAT.child("grupos").child(grupoId).child("nome")
+                        .setValue(novoNome)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                ex.printStackTrace();
+                                e.onNext(false);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Boolean> deletarGrupo(final String grupoId) {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("grupos").child(grupoId)
                         .removeValue()
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -394,7 +418,8 @@ public class ChatManager
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception ex) {
-                                e.onError(ex);
+                                ex.printStackTrace();
+                                e.onNext(false);
                                 e.onComplete();
                             }
                         });
@@ -587,6 +612,120 @@ public class ChatManager
         });
     }
 
+    public Observable<Pair<Integer, Conversa>> monitorarConversas(final String grupoId) {
+        return Observable.create(new ObservableOnSubscribe<Pair<Integer, Conversa>>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Pair<Integer, Conversa>> e) throws Exception {
+                CHAT.child("grupos").child(grupoId).child("conversas")
+                        .addChildEventListener(new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                Conversa conversa = dataSnapshot.getValue(Conversa.class);
+                                conversa.id = dataSnapshot.getKey();
+                                e.onNext(new Pair<>(0, conversa));
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                                Conversa conversa = dataSnapshot.getValue(Conversa.class);
+                                conversa.id = dataSnapshot.getKey();
+                                e.onNext(new Pair<>(1, conversa));
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                Conversa conversa = dataSnapshot.getValue(Conversa.class);
+                                conversa.id = dataSnapshot.getKey();
+                                e.onNext(new Pair<>(2, conversa));
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                                Conversa conversa = dataSnapshot.getValue(Conversa.class);
+                                conversa.id = dataSnapshot.getKey();
+                                e.onNext(new Pair<>(3, conversa));
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                e.onError(databaseError.toException());
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Pair<Integer, Grupo>> monitorarGruposDoUsuario(final String usuarioId) {
+        return Observable.create(new ObservableOnSubscribe<Pair<Integer, Grupo>>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Pair<Integer, Grupo>> e) throws Exception {
+                CHAT.child("usuarios").child(usuarioId).child("grupos")
+                        .addChildEventListener(new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                Grupo grupo = dataSnapshot.getValue(Grupo.class);
+                                grupo.id = dataSnapshot.getKey();
+                                e.onNext(new Pair<>(0, grupo));
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                                Grupo grupo = dataSnapshot.getValue(Grupo.class);
+                                grupo.id = dataSnapshot.getKey();
+                                e.onNext(new Pair<>(1, grupo));
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                Grupo grupo = dataSnapshot.getValue(Grupo.class);
+                                grupo.id = dataSnapshot.getKey();
+                                e.onNext(new Pair<>(2, grupo));
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                                Grupo grupo = dataSnapshot.getValue(Grupo.class);
+                                grupo.id = dataSnapshot.getKey();
+                                e.onNext(new Pair<>(3, grupo));
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                e.onError(databaseError.toException());
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Boolean> criarConversa(final String grupoId, String texto, Usuario usuario) {
+        final Conversa conversa = new Conversa(usuario, texto, System.currentTimeMillis());
+
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                final String id = CHAT.child("grupos").child(grupoId).child("conversas").push().getKey();
+                CHAT.child("grupos").child(grupoId).child("conversas").child(id)
+                        .setValue(conversa)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                ex.printStackTrace();
+                                e.onNext(false);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
     @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         if (firebaseAuth.getCurrentUser() != null) {
@@ -595,12 +734,6 @@ public class ChatManager
     }
 
     public interface ChatManagerListener {
-
-        void novoGrupo(Grupo grupo);
-
-        void grupoRemovido(Grupo grupo);
-
-        void grupoModificado(Grupo grupo);
 
         void novaInstituicao(Instituicao instituicao);
 
@@ -622,56 +755,6 @@ public class ChatManager
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-        }
-    }
-
-    public class GroupChildEventListener implements ChildEventListener {
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            Grupo grupo = dataSnapshot.getValue(Grupo.class);
-            String key = dataSnapshot.getKey();
-            if (grupo != null && grupo.admin.equals(mUsuario.email)) {
-                if (!mGrupos.containsKey(key)) {
-                    Logger.d("Novo grupo: %s", grupo);
-                    grupo.id = key;
-                    mGrupos.put(key, grupo);
-                    for (ChatManagerListener l : mListeners) l.novoGrupo(grupo);
-                }
-            }
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            Grupo grupo = dataSnapshot.getValue(Grupo.class);
-            String key = dataSnapshot.getKey();
-            if (grupo != null && mGrupos.containsKey(key)) {
-                grupo.id = key;
-                mGrupos.put(key, grupo);
-                for (ChatManagerListener l : mListeners) {
-                    l.grupoModificado(grupo);
-                }
-            }
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-            Grupo grupo = dataSnapshot.getValue(Grupo.class);
-            String key = dataSnapshot.getKey();
-            if (grupo != null) {
-                mGrupos.remove(key);
-                for (ChatManagerListener l : mListeners) l.grupoRemovido(grupo);
-            }
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
         }
     }
 
