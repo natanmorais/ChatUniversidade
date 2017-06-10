@@ -11,6 +11,7 @@ import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.InstuticoesPresenter;
 import br.tiagohm.chatuniversidade.presentation.view.activity.AulasActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.ContaActivity;
+import br.tiagohm.chatuniversidade.presentation.view.activity.ConvitesActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.InstituicoesActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.LoginActivity;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.AcceptConviteDialog;
@@ -47,4 +48,6 @@ public interface ChatComponent {
     void inject(AcceptConviteDialog dialog);
 
     void inject(ConvitePresenter presenter);
+
+    void inject(ConvitesActivity activity);
 }
