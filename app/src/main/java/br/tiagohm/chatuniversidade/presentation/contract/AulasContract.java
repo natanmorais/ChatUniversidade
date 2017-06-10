@@ -13,11 +13,11 @@ public interface AulasContract {
 
         void showMessage(String message);
 
-        void finish();
+        void adicionarAula(Aula aula);
 
-        void mostrarAulas(List<Aula> aulas);
+        void atualizarLista();
 
-        void carregarAulas();
+        void removerAula(Aula aula);
     }
 
     interface Presenter extends MvpPresenter<AulasContract.View> {
@@ -28,6 +28,6 @@ public interface AulasContract {
 
         void removerAula(String grupoId, Aula aula);
 
-        void carregarAulas(String grupoId);
+        void monitorarAulas(String grupoId);
     }
 }

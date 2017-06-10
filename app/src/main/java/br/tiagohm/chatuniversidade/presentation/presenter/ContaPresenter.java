@@ -1,12 +1,14 @@
 package br.tiagohm.chatuniversidade.presentation.presenter;
 
 import android.text.TextUtils;
+import android.util.Pair;
 
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
 import javax.inject.Inject;
 
 import br.tiagohm.chatuniversidade.common.App;
+import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.ContaContract;
 import io.reactivex.functions.Consumer;
@@ -71,6 +73,20 @@ public class ContaPresenter extends MvpBasePresenter<ContaContract.View>
                             getView().finish();
                         } else {
                             getView().showMessage("Erro ao atualizar a conta!");
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void obterInstituicoes() {
+        chatManager.monitorarInstituicoes()
+                .subscribe(new Consumer<Pair<Integer, Instituicao>>() {
+                    @Override
+                    public void accept(Pair<Integer, Instituicao> i) throws Exception {
+                        if (i.first == 0) {
+                            getView().adicionarInstituicao(i.second);
+                            getView().atualizaListaDeInstituicoes();
                         }
                     }
                 });

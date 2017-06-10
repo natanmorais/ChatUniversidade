@@ -56,4 +56,9 @@ public class Instituicao implements Serializable {
         result = 31 * result + email.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return nome;
+    }
 }

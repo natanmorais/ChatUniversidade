@@ -14,15 +14,12 @@ import android.widget.Toast;
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import br.tiagohm.chatuniversidade.R;
-import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Aula;
-import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.AulasContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.AulasPresenter;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.CriarAulaDialog;
@@ -36,13 +33,11 @@ import io.reactivex.functions.Consumer;
 public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract.Presenter>
         implements AulasContract.View {
 
-    @Inject
-    ChatManager chatManager;
+    private final List<Aula> mAulas = new ArrayList<>();
     @BindView(R.id.novaAula)
     FloatingActionButton mCriarGrupoButton;
     @BindView(R.id.minhasAulas)
     RecyclerView mAulasList;
-
     private String mGrupo;
 
     @Override
@@ -52,8 +47,6 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
         setTitle("Aulas");
 
         ButterKnife.bind(this);
-
-        App.getChatComponent().inject(this);
 
         mAulasList.setLayoutManager(new LinearLayoutManager(this));
         mAulasList.setAdapter(new AulasAdapter());
@@ -71,7 +64,7 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
             finish();
         }
 
-        presenter.carregarAulas(mGrupo);
+        presenter.monitorarAulas(mGrupo);
     }
 
     @NonNull
@@ -83,11 +76,6 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
     @Override
     public void showMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void carregarAulas() {
-        presenter.carregarAulas(mGrupo);
     }
 
     @OnClick(R.id.novaAula)
@@ -107,19 +95,23 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
     }
 
     @Override
-    public void mostrarAulas(List<Aula> aulas) {
-        ((AulasAdapter) mAulasList.getAdapter()).setAulas(aulas);
+    public void adicionarAula(Aula aula) {
+        mAulas.add(aula);
+    }
+
+    @Override
+    public void removerAula(Aula aula) {
+        mAulas.remove(aula);
+    }
+
+    @Override
+    public void atualizarLista() {
         mAulasList.getAdapter().notifyDataSetChanged();
     }
 
     public class AulasAdapter extends RecyclerView.Adapter<AulasAdapter.Holder> {
 
         private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        private List<Aula> mAulas;
-
-        public void setAulas(List<Aula> aulas) {
-            mAulas = aulas;
-        }
 
         @Override
         public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -137,7 +129,7 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
 
         @Override
         public int getItemCount() {
-            return mAulas != null ? mAulas.size() : 0;
+            return mAulas.size();
         }
 
         public class Holder extends RecyclerView.ViewHolder {

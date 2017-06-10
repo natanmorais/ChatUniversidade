@@ -11,7 +11,6 @@ import io.reactivex.functions.Consumer;
 public class EntrarPresenter extends MvpBasePresenter<EntrarContract.View>
         implements EntrarContract.Presenter {
 
-    private ChatManager mChatManager;
     private LoginContract.Presenter mLoginPresenter;
 
     public EntrarPresenter(LoginContract.Presenter presenter) {

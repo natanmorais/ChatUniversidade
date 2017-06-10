@@ -21,16 +21,16 @@ import io.reactivex.ObservableOnSubscribe;
 
 public class EditarGrupoDialog extends AlertDialog.Builder {
 
-    @BindView(R.id.instituicaoEditable)
+    @BindView(R.id.instituicaoInput)
     public EditText mInstituicao;
-    @BindView(R.id.nomeEditable)
+    @BindView(R.id.nomeInput)
     public EditText mNome;
+    @BindView(R.id.administradorInput)
+    public EditText mAdmin;
     @BindView(R.id.editarButton)
     public Button mEditarButton;
     @BindView(R.id.deletarButton)
     public Button mDeletarButton;
-    @Inject
-    ChatManager chatManager;
 
     private AlertDialog mDialog;
     private Grupo mGrupo;
@@ -45,10 +45,9 @@ public class EditarGrupoDialog extends AlertDialog.Builder {
 
         ButterKnife.bind(this, view);
 
-        App.getChatComponent().inject(this);
-
         mNome.setText(mGrupo.nome);
         mInstituicao.setText(mGrupo.instituicao);
+        mAdmin.setText(mGrupo.admin.email);
     }
 
     public Observable<Integer> exibir() {

@@ -4,24 +4,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 
-import javax.inject.Inject;
-
 import br.tiagohm.chatuniversidade.R;
 import br.tiagohm.chatuniversidade.common.App;
-import br.tiagohm.chatuniversidade.model.entity.Instituicao;
-import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.ConviteContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.ConvitePresenter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by root on 10/06/17.
- */
 public class ConvitesActivity extends MvpActivity<ConviteContract.View, ConviteContract.Presenter>
         implements ConviteContract.View {
 
@@ -29,8 +21,6 @@ public class ConvitesActivity extends MvpActivity<ConviteContract.View, ConviteC
     RecyclerView mConvitesEnviados;
     @BindView(R.id.convitesRecebidos)
     RecyclerView mConvitesRecebidos;
-    @Inject
-    ChatManager chatManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,5 +35,20 @@ public class ConvitesActivity extends MvpActivity<ConviteContract.View, ConviteC
         mConvitesEnviados.setLayoutManager(new LinearLayoutManager(this));
         mConvitesRecebidos.setLayoutManager(new LinearLayoutManager(this));
     }
-    
+
+    @NonNull
+    @Override
+    public ConviteContract.Presenter createPresenter() {
+        return new ConvitePresenter();
+    }
+
+    @Override
+    public void atualizarListaRemetente() {
+
+    }
+
+    @Override
+    public void atualizarListaDestinatario() {
+
+    }
 }

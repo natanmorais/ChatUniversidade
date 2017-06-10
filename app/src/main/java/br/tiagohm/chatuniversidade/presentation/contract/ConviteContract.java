@@ -4,23 +4,25 @@ import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 import br.tiagohm.chatuniversidade.model.entity.Convite;
+import br.tiagohm.chatuniversidade.model.entity.Grupo;
 
-/**
- * Created by root on 09/06/17.
- */
 public interface ConviteContract {
 
     interface View extends MvpView {
 
-        void updateList();
+        void atualizarListaRemetente();
+
+        void atualizarListaDestinatario();
     }
 
     interface Presenter extends MvpPresenter<ConviteContract.View> {
 
-        void novoConvite(String nomeGrupo, String email);
+        void novoConvite(Grupo grupo, String email);
 
         void aceitarConvite(Convite convite);
 
-        void removerConvite(Convite convite);
+        void revogarConvite(Convite convite);
+
+        void recusarConvite(Convite convite);
     }
 }

@@ -13,12 +13,11 @@ import android.widget.Toast;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 
-import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 import br.tiagohm.chatuniversidade.R;
-import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
-import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.InstuticaoContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.InstuticoesPresenter;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.CriarInstituicaoDialog;
@@ -29,14 +28,14 @@ import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
 
 public class InstituicoesActivity extends MvpActivity<InstuticaoContract.View, InstuticaoContract.Presenter>
-        implements InstuticaoContract.View, ChatManager.ChatManagerListener {
+        implements InstuticaoContract.View {
+
+    private final List<Instituicao> mInstituicoes = new ArrayList<>();
 
     @BindView(R.id.novaInstituicao)
     FloatingActionButton mAdicionarInstituicaoButton;
     @BindView(R.id.minhasInstituicoes)
     RecyclerView mMinhasInstituicoes;
-    @Inject
-    ChatManager chatManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,52 +45,34 @@ public class InstituicoesActivity extends MvpActivity<InstuticaoContract.View, I
 
         ButterKnife.bind(this);
 
-        App.getChatComponent().inject(this);
-
-        if (chatManager.getUsuario().tipo != 1) {
+        if (presenter.getUsuario().tipo != 2) {
             mAdicionarInstituicaoButton.setVisibility(View.GONE);
         }
 
         mMinhasInstituicoes.setLayoutManager(new LinearLayoutManager(this));
+        mMinhasInstituicoes.setAdapter(new InstituicaoAdapter());
+        presenter.monitorarInstituicao();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mMinhasInstituicoes.setAdapter(new InstituicaoAdapter());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        chatManager.add(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        chatManager.remove(this);
     }
 
     @NonNull
     @Override
     public InstuticaoContract.Presenter createPresenter() {
         return new InstuticoesPresenter();
-    }
-
-    @Override
-    public void novaInstituicao(Instituicao instituicao) {
-        updateList();
-    }
-
-    @Override
-    public void instituicaoModificada(Instituicao instituicao) {
-        updateList();
-    }
-
-    @Override
-    public void instituicaoRemovida(Instituicao instituicao) {
-        updateList();
     }
 
     @Override
@@ -146,6 +127,16 @@ public class InstituicoesActivity extends MvpActivity<InstuticaoContract.View, I
                 });
     }
 
+    @Override
+    public void adicionarInstituicao(Instituicao instituicao) {
+        mInstituicoes.add(instituicao);
+    }
+
+    @Override
+    public void removerInstituicao(Instituicao instituicao) {
+        mInstituicoes.remove(instituicao);
+    }
+
     public class InstituicaoAdapter extends RecyclerView.Adapter<InstituicoesActivity.InstituicaoAdapter.Holder> {
 
         @Override
@@ -156,7 +147,7 @@ public class InstituicoesActivity extends MvpActivity<InstuticaoContract.View, I
 
         @Override
         public void onBindViewHolder(InstituicoesActivity.InstituicaoAdapter.Holder holder, int position) {
-            Instituicao instituicao = chatManager.getInstituicoes().get(position);
+            Instituicao instituicao = mInstituicoes.get(position);
             holder.mView.setTag(instituicao);
             holder.mNome.setText(instituicao.nome);
             holder.mSigla.setText(instituicao.sigla);
@@ -164,7 +155,7 @@ public class InstituicoesActivity extends MvpActivity<InstuticaoContract.View, I
 
         @Override
         public int getItemCount() {
-            return chatManager.getInstituicoes().size();
+            return mInstituicoes.size();
         }
 
         public class Holder extends RecyclerView.ViewHolder {

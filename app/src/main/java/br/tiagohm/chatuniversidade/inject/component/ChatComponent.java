@@ -9,6 +9,7 @@ import br.tiagohm.chatuniversidade.presentation.presenter.ConvitePresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.GrupoPresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.InstuticoesPresenter;
+import br.tiagohm.chatuniversidade.presentation.presenter.RegistrarPresenter;
 import br.tiagohm.chatuniversidade.presentation.view.activity.AulasActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.ContaActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.ConvitesActivity;
@@ -25,23 +26,17 @@ public interface ChatComponent {
 
     void inject(ContaActivity activity);
 
-    void inject(LoginActivity activity);
-
     void inject(ContaPresenter presenter);
 
     void inject(HomePresenter presenter);
 
     void inject(EditarGrupoDialog dialog);
 
-    void inject(InstituicoesActivity activity);
-
     void inject(InstuticoesPresenter presenter);
 
     void inject(AulasPresenter presenter);
 
     void inject(GrupoPresenter presenter);
-
-    void inject(AulasActivity activity);
 
     void inject(RevogarConviteDialog dialog);
 
@@ -50,4 +45,6 @@ public interface ChatComponent {
     void inject(ConvitePresenter presenter);
 
     void inject(ConvitesActivity activity);
+
+    void inject(RegistrarPresenter presenter);
 }

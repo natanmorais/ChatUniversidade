@@ -5,8 +5,8 @@ import com.google.gson.annotations.SerializedName;
 import com.stfalcon.chatkit.commons.models.IUser;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+
+import br.tiagohm.chatuniversidade.common.utils.Utils;
 
 /**
  * Representa um usuário logado dentro do sistema.
@@ -23,8 +23,6 @@ public class Usuario implements Serializable, IUser {
     public String matricula;
     @SerializedName("email")
     public String email;
-    @SerializedName("grupos")
-    public List<Grupo> grupos = new ArrayList<>(0);
 
     public Usuario() {
     }
@@ -67,6 +65,11 @@ public class Usuario implements Serializable, IUser {
         return null;
     }
 
+    @Exclude
+    public String getIdAsHash() {
+        return Utils.gerarHash(email);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -79,7 +82,6 @@ public class Usuario implements Serializable, IUser {
         if (!nome.equals(usuario.nome)) return false;
         if (!matricula.equals(usuario.matricula)) return false;
         return email.equals(usuario.email);
-
     }
 
     @Override

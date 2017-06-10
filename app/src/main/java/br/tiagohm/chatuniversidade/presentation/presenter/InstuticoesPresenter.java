@@ -1,11 +1,14 @@
 package br.tiagohm.chatuniversidade.presentation.presenter;
 
+import android.util.Pair;
+
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
 import javax.inject.Inject;
 
 import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
+import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.InstuticaoContract;
 import io.reactivex.functions.Consumer;
@@ -18,6 +21,11 @@ public class InstuticoesPresenter extends MvpBasePresenter<InstuticaoContract.Vi
 
     public InstuticoesPresenter() {
         App.getChatComponent().inject(this);
+    }
+
+    @Override
+    public Usuario getUsuario() {
+        return chatManager.getUsuario();
     }
 
     @Override
@@ -61,6 +69,26 @@ public class InstuticoesPresenter extends MvpBasePresenter<InstuticaoContract.Vi
                     @Override
                     public void accept(Throwable throwable) throws Exception {
 
+                    }
+                });
+    }
+
+    @Override
+    public void monitorarInstituicao() {
+        chatManager.monitorarInstituicoes()
+                .subscribe(new Consumer<Pair<Integer, Instituicao>>() {
+                    @Override
+                    public void accept(Pair<Integer, Instituicao> i) throws Exception {
+                        //Added
+                        if (i.first == 0) {
+                            getView().adicionarInstituicao(i.second);
+                            getView().updateList();
+                        }
+                        //Deleted
+                        else if (i.first == 2) {
+                            getView().removerInstituicao(i.second);
+                            getView().updateList();
+                        }
                     }
                 });
     }

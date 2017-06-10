@@ -16,9 +16,13 @@ public interface HomeContract {
         void atualizarGrupo(Grupo grupo);
 
         void showMessage(String message);
+
+        void atualizarLista();
     }
 
     interface Presenter extends MvpPresenter<View> {
+
+        void carregar(String email);
 
         void deslogar();
 

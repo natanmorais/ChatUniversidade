@@ -16,14 +16,13 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import br.tiagohm.chatuniversidade.R;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
-import br.tiagohm.chatuniversidade.model.entity.Instituicao;
-import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.HomeContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.CriarGrupoDialog;
@@ -34,14 +33,14 @@ import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
 
 public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Presenter>
-        implements HomeContract.View, FirebaseAuth.AuthStateListener, ChatManager.ChatManagerListener {
+        implements HomeContract.View, FirebaseAuth.AuthStateListener {
 
     @BindView(R.id.novoGrupo)
     FloatingActionButton mCriarGrupoButton;
     @BindView(R.id.meusGrupos)
     RecyclerView mMeusGrupos;
 
-    private List<Grupo> grupos = new ArrayList<>();
+    private List<Grupo> mGrupos = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +51,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
         ButterKnife.bind(this);
 
         mMeusGrupos.setLayoutManager(new LinearLayoutManager(this));
+        mMeusGrupos.setAdapter(new GruposAdapter());
     }
 
     @Override
@@ -69,9 +69,6 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
     @Override
     protected void onResume() {
         super.onResume();
-
-        mMeusGrupos.setAdapter(new GruposAdapter());
-        presenter.monitorarMeusGrupos();
     }
 
     @NonNull
@@ -99,6 +96,9 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                 Intent b = new Intent(this, InstituicoesActivity.class);
                 startActivity(b);
                 break;
+            case R.id.sair:
+                presenter.deslogar();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -108,9 +108,13 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         //Deslogado.
         if (firebaseAuth.getCurrentUser() == null) {
+            Logger.d("Deslogou");
             Intent i = new Intent(this, LoginActivity.class);
             startActivity(i);
             finish();
+        } else {
+            Logger.d("logou");
+            presenter.carregar(firebaseAuth.getCurrentUser().getEmail());
         }
     }
 
@@ -141,10 +145,18 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                     @Override
                     public void accept(Integer opt) throws Exception {
                         if (opt == 1) {
+                            //O nome foi alterado.
                             if (dialog.mNome.length() > 0) {
                                 presenter.editarGrupo(grupo.id, dialog.mNome.getText().toString());
                             } else {
-                                Toast.makeText(HomeActivity.this, "Campos inválidos ou em branco", Toast.LENGTH_SHORT).show();
+                                showMessage("Campos inválidos ou em branco");
+                                return;
+                            }
+
+                            //O Admin vai ser alterado.
+                            if (dialog.mAdmin.length() > 0 &&
+                                    !dialog.mAdmin.getText().toString().equals(grupo.admin.email)) {
+
                             }
                         } else if (opt == 2) {
                             presenter.deletarGrupo(grupo.id);
@@ -154,18 +166,8 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
     }
 
     @Override
-    public void novaInstituicao(Instituicao instituicao) {
-
-    }
-
-    @Override
-    public void instituicaoModificada(Instituicao instituicao) {
-
-    }
-
-    @Override
-    public void instituicaoRemovida(Instituicao instituicao) {
-
+    public void atualizarLista() {
+        mMeusGrupos.getAdapter().notifyDataSetChanged();
     }
 
     @Override
@@ -175,23 +177,27 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
     @Override
     public void adicionarGrupo(Grupo grupo) {
-        grupos.add(grupo);
-        mMeusGrupos.getAdapter().notifyDataSetChanged();
+        mGrupos.add(grupo);
     }
 
     @Override
     public void removerGrupo(Grupo grupo) {
-        grupos.remove(grupo);
-        mMeusGrupos.getAdapter().notifyDataSetChanged();
+        mGrupos.remove(grupo);
     }
 
     @Override
     public void atualizarGrupo(Grupo grupo) {
-        for (int i = 0; i < grupos.size(); i++) {
-            if (grupos.get(i).id.equals(grupo.id)) {
-                grupos.set(i, grupo);
-                mMeusGrupos.getAdapter().notifyDataSetChanged();
-                return;
+        for (int i = 0; i < mGrupos.size(); i++) {
+            if (mGrupos.get(i).id.equals(grupo.id)) {
+                if (!mGrupos.get(i).admin.equals(grupo.admin)) {
+                    mGrupos.remove(i);
+                    mMeusGrupos.getAdapter().notifyDataSetChanged();
+                    return;
+                } else {
+                    mGrupos.set(i, grupo);
+                    mMeusGrupos.getAdapter().notifyDataSetChanged();
+                    return;
+                }
             }
         }
     }
@@ -206,7 +212,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
         @Override
         public void onBindViewHolder(Holder holder, int position) {
-            Grupo grupo = grupos.get(position);
+            Grupo grupo = mGrupos.get(position);
             holder.mView.setTag(grupo);
             holder.mNomeDoGrupo.setText(grupo.nome);
             holder.mInstituicaoDoGrupo.setText(grupo.instituicao);
@@ -214,7 +220,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
         @Override
         public int getItemCount() {
-            return grupos.size();
+            return mGrupos.size();
         }
 
         public class Holder extends RecyclerView.ViewHolder {

@@ -50,7 +50,7 @@ public class AcceptConviteDialog extends AlertDialog.Builder{
 
         App.getChatComponent().inject(this);
 
-        mNomeGrupo.setText(mConvite.nomeGrupo);
+        mNomeGrupo.setText(mConvite.grupo.nome);
         mRemetenteConvite.setText(mConvite.remetente);
     }
 

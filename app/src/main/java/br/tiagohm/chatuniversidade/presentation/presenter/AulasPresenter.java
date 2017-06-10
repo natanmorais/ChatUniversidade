@@ -1,8 +1,8 @@
 package br.tiagohm.chatuniversidade.presentation.presenter;
 
-import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
+import android.util.Pair;
 
-import java.util.List;
+import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
 import javax.inject.Inject;
 
@@ -23,21 +23,34 @@ public class AulasPresenter extends MvpBasePresenter<AulasContract.View>
     }
 
     @Override
+    public void monitorarAulas(String grupoId) {
+        chatManager.monitorarAulas(grupoId)
+                .subscribe(new Consumer<Pair<Integer, Aula>>() {
+                    @Override
+                    public void accept(Pair<Integer, Aula> aula) throws Exception {
+                        //Added
+                        if (aula.first == 0) {
+                            getView().adicionarAula(aula.second);
+                            getView().atualizarLista();
+                        }
+                        //Removed
+                        else if (aula.first == 2) {
+                            getView().removerAula(aula.second);
+                            getView().atualizarLista();
+                        }
+                    }
+                });
+    }
+
+    @Override
     public void novaAula(String grupoId, String titulo, String conteudo) {
         chatManager.criarAula(grupoId, titulo, conteudo)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
-                        if (success) {
-                            getView().showMessage("Aula criada!");
-                            getView().carregarAulas();
+                        if (!success) {
+                            getView().showMessage("Erro ao criar a aula");
                         }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable t) throws Exception {
-                        t.printStackTrace();
-                        getView().showMessage("Erro ao criar a aula: " + t.getMessage());
                     }
                 });
     }
@@ -48,14 +61,9 @@ public class AulasPresenter extends MvpBasePresenter<AulasContract.View>
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
-                        if (success) {
-                            getView().carregarAulas();
+                        if (!success) {
+                            getView().showMessage("Erro ao editar a aula");
                         }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        getView().showMessage("Erro ao editar aula!");
                     }
                 });
     }
@@ -66,30 +74,9 @@ public class AulasPresenter extends MvpBasePresenter<AulasContract.View>
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
-                        if (success) {
-                            getView().carregarAulas();
+                        if (!success) {
+                            getView().showMessage("Erro ao remover a aula");
                         }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        getView().showMessage("Erro ao remover aula!");
-                    }
-                });
-    }
-
-    @Override
-    public void carregarAulas(String grupoId) {
-        chatManager.verAulas(grupoId)
-                .subscribe(new Consumer<List<Aula>>() {
-                    @Override
-                    public void accept(List<Aula> aulas) throws Exception {
-                        getView().mostrarAulas(aulas);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-
                     }
                 });
     }

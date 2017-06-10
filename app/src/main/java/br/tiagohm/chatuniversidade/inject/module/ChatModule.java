@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 
 import javax.inject.Singleton;
 
+import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import dagger.Module;
 import dagger.Provides;
@@ -29,5 +30,11 @@ public class ChatModule {
     @Singleton
     public ChatManager providesChatManager() {
         return new ChatManager();
+    }
+
+    @Provides
+    @Singleton
+    public Usuario providesUsuario(ChatManager chatManager) {
+        return chatManager.getUsuario();
     }
 }

@@ -19,7 +19,23 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
     ChatManager chatManager;
 
     public HomePresenter() {
+
         App.getChatComponent().inject(this);
+    }
+
+    @Override
+    public void carregar(String email) {
+        chatManager.carregar(email)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean success) throws Exception {
+                        if (success) {
+                            monitorarMeusGrupos();
+                        } else {
+                            getView().showMessage("Erro ao carregar o usuário");
+                        }
+                    }
+                });
     }
 
     @Override
@@ -29,21 +45,24 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
 
     @Override
     public void monitorarMeusGrupos() {
-        chatManager.monitorarGruposDoUsuario(chatManager.getUsuario().getId())
+        chatManager.monitorarMeusGrupos()
                 .subscribe(new Consumer<Pair<Integer, Grupo>>() {
                     @Override
                     public void accept(Pair<Integer, Grupo> grupo) throws Exception {
                         //Added
                         if (grupo.first == 0) {
                             getView().adicionarGrupo(grupo.second);
+                            getView().atualizarLista();
                         }
                         //Changed.
                         else if (grupo.first == 1) {
-                            //Conversas nao podem ser modificadas.
+                            getView().atualizarGrupo(grupo.second);
+                            getView().atualizarLista();
                         }
                         //Removed
                         else if (grupo.first == 2) {
                             getView().removerGrupo(grupo.second);
+                            getView().atualizarLista();
                         }
                     }
                 });

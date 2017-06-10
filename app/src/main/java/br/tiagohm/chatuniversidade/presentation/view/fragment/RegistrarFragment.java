@@ -6,13 +6,20 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.hannesdorfmann.mosby3.mvp.MvpFragment;
 import com.orhanobut.logger.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import br.tiagohm.chatuniversidade.R;
+import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.presentation.contract.LoginContract;
 import br.tiagohm.chatuniversidade.presentation.contract.RegistrarContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.RegistrarPresenter;
@@ -28,13 +35,15 @@ public class RegistrarFragment extends MvpFragment<RegistrarContract.View, Regis
     @BindView(R.id.senhaInput)
     EditText mSenha;
     @BindView(R.id.instituicaoInput)
-    EditText mInstituicao;
+    Spinner mInstituicao;
     @BindView(R.id.nomeInput)
     EditText mNome;
     @BindView(R.id.matriculaInput)
     EditText mMatricula;
     @BindView(R.id.souProfessorCb)
     CheckBox mSouProfessor;
+
+    private List<Instituicao> mInstituicoes = new ArrayList<>();
 
     public static RegistrarFragment newInstance() {
         return new RegistrarFragment();
@@ -55,7 +64,12 @@ public class RegistrarFragment extends MvpFragment<RegistrarContract.View, Regis
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         ButterKnife.bind(this, view);
+
+        mInstituicao.setAdapter(new InstituicaoSpinnerAdapter());
+
+        presenter.obterInstituicoes();
     }
 
     @NonNull
@@ -65,10 +79,25 @@ public class RegistrarFragment extends MvpFragment<RegistrarContract.View, Regis
                 ((LoginContract.View) getActivity()).getPresenter());
     }
 
+    @Override
+    public void adicionarInstituicao(Instituicao instituicao) {
+        mInstituicoes.add(instituicao);
+    }
+
+    @Override
+    public void removerInstituicao(Instituicao instituicao) {
+        mInstituicoes.remove(instituicao);
+    }
+
+    @Override
+    public void atualizaListaDeInstituicoes() {
+        ((BaseAdapter) mInstituicao.getAdapter()).notifyDataSetChanged();
+    }
+
     @OnClick(R.id.registrarButton)
     public void registrar() {
         Logger.d("registrar()");
-        presenter.registrar(mInstituicao.getText().toString(),
+        presenter.registrar((String) mInstituicao.getSelectedItem(),
                 mNome.getText().toString(),
                 mSouProfessor.isChecked() ? 1 : 0,
                 mMatricula.getText().toString(),
@@ -80,5 +109,35 @@ public class RegistrarFragment extends MvpFragment<RegistrarContract.View, Regis
     public void queroLogar() {
         Logger.d("queroLogar()");
         presenter.getLoginPresenter().mostrarTelaDeEntrar();
+    }
+
+    private class InstituicaoSpinnerAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return mInstituicoes.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mInstituicoes.get(position).nome;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext())
+                        .inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
+            }
+
+            ((CheckedTextView) convertView).setText((String) getItem(position));
+
+            return convertView;
+        }
     }
 }

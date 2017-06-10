@@ -11,4 +11,9 @@
         android:icon="@drawable/user"
         android:title="MinhaConta"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/sair"
+        android:icon="@drawable/exit"
+        android:title="Sair"
+        app:showAsAction="always" />
 </menu>

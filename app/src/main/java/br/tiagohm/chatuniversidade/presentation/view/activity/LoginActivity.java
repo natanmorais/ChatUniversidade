@@ -28,8 +28,6 @@ public class LoginActivity extends MvpActivity<LoginContract.View, LoginContract
 
         ButterKnife.bind(this);
 
-        App.getChatComponent().inject(this);
-
         mostrarTelaDeEntrar();
     }
 

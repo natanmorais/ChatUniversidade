@@ -3,32 +3,29 @@ package br.tiagohm.chatuniversidade.model.entity;
 import com.google.firebase.database.Exclude;
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by root on 08/06/17.
- */
 public class Convite {
 
     @Exclude
     public transient String id;
-    @SerializedName("nomeGrupo")
-    public String nomeGrupo;
+    @SerializedName("grupo")
+    public Grupo grupo;
     @SerializedName("remetente")
     public String remetente;
     @SerializedName("destinatario")
     public String destinatario;
 
-    public Convite() {}
+    public Convite() {
+    }
 
-    public Convite(String pNomeGrupo, Usuario remetente, String destinatario){
-        this.nomeGrupo = pNomeGrupo;
-        this.remetente = remetente.email;
+    public Convite(Grupo grupo, String remetente, String destinatario) {
+        this.grupo = grupo;
+        this.remetente = remetente;
         this.destinatario = destinatario;
     }
 
     @Override
     public String toString() {
         return "Convite {" +
-                "nomeGrupo=" + nomeGrupo +
                 ", remetente='" + remetente + '\'' +
                 ", destinatário='" + destinatario + '\'' +
                 '}';
@@ -41,7 +38,7 @@ public class Convite {
 
         Convite convite = (Convite) o;
 
-        if (!nomeGrupo.equals(convite.nomeGrupo)) return false;
+        if (!grupo.equals(convite.grupo)) return false;
         if (!remetente.equals(convite.remetente)) return false;
         return destinatario.equals(convite.destinatario);
     }
@@ -49,7 +46,7 @@ public class Convite {
     @Override
     public int hashCode() {
         int result = 0;
-        result = 31 * result + nomeGrupo.hashCode();
+        result = 31 * result + grupo.hashCode();
         result = 31 * result + remetente.hashCode();
         result = 31 * result + destinatario.hashCode();
         return result;

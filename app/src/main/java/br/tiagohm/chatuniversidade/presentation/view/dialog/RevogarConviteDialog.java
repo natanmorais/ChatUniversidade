@@ -48,7 +48,7 @@ public class RevogarConviteDialog extends AlertDialog.Builder {
 
         App.getChatComponent().inject(this);
 
-        mNomeGrupo.setText(mConvite.nomeGrupo);
+        mNomeGrupo.setText(mConvite.grupo.nome);
         mEmail.setText(mConvite.destinatario);
     }
 
