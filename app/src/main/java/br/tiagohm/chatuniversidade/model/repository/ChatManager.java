@@ -617,8 +617,8 @@ public class ChatManager {
     /**
      * Cria uma aula.
      */
-    public Observable<Boolean> criarAula(final String grupoId, String titulo, String conteudo) {
-        final Aula aula = new Aula(titulo, conteudo);
+    public Observable<Boolean> criarAula(final String grupoId, String titulo, String conteudo, long data) {
+        final Aula aula = new Aula(titulo, conteudo, data);
 
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
@@ -647,8 +647,8 @@ public class ChatManager {
     /**
      * Modifica os dados da aula.
      */
-    public Observable<Boolean> editarAula(final String grupoId, final String aulaId, String titulo, String conteudo) {
-        final Aula aula = new Aula(titulo, conteudo);
+    public Observable<Boolean> editarAula(final String grupoId, final String aulaId, String titulo, String conteudo, long data) {
+        final Aula aula = new Aula(titulo, conteudo, data);
 
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override

@@ -3,7 +3,9 @@ package br.tiagohm.chatuniversidade.model.entity;
 import com.google.firebase.database.Exclude;
 import com.google.gson.annotations.SerializedName;
 
-public class Convite {
+import java.io.Serializable;
+
+public class Convite implements Serializable {
 
     @Exclude
     public transient String id;

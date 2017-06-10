@@ -7,9 +7,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import br.tiagohm.chatuniversidade.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import devs.mulham.horizontalcalendar.HorizontalCalendar;
+import devs.mulham.horizontalcalendar.HorizontalCalendarListener;
+import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -21,6 +27,8 @@ public class CriarAulaDialog extends AlertDialog.Builder {
     public EditText mConteudo;
     @BindView(R.id.criarButton)
     public Button mCriarButton;
+    @BindView(R.id.calendarView)
+    public HorizontalCalendarView mCalendario;
 
     private AlertDialog mDialog;
 
@@ -31,6 +39,22 @@ public class CriarAulaDialog extends AlertDialog.Builder {
         setView(view);
 
         ButterKnife.bind(this, view);
+
+        Calendar endDate = Calendar.getInstance();
+        endDate.add(Calendar.MONTH, 6);
+        Calendar startDate = Calendar.getInstance();
+        startDate.add(Calendar.MONTH, -6);
+
+        HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(view, R.id.calendarView)
+                .startDate(startDate.getTime())
+                .endDate(endDate.getTime())
+                .build();
+        horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
+            @Override
+            public void onDateSelected(Date date, int position) {
+            }
+        });
+        mCalendario.setHorizontalCalendar(horizontalCalendar);
     }
 
     public Observable<Boolean> exibir() {

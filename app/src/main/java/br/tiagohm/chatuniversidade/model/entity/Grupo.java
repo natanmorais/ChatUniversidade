@@ -19,10 +19,6 @@ public class Grupo implements Serializable {
     public String nome;
     @SerializedName("tipo")
     public int tipo;
-    @SerializedName("conversas")
-    public List<Conversa> conversas = new ArrayList<>(0);
-    @SerializedName("usuarios")
-    public List<Usuario> usuarios = new ArrayList<>(0);
 
     public Grupo() {
     }

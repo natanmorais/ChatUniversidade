@@ -18,13 +18,15 @@ public interface AulasContract {
         void atualizarLista();
 
         void removerAula(Aula aula);
+
+        void atualizarAula(Aula aula);
     }
 
     interface Presenter extends MvpPresenter<AulasContract.View> {
 
-        void novaAula(String grupoId, String titulo, String conteudo);
+        void novaAula(String grupoId, String titulo, String conteudo, long data);
 
-        void editarAula(String grupoId, String id, String titulo, String conteudo);
+        void editarAula(String grupoId, String id, String titulo, String conteudo, long data);
 
         void removerAula(String grupoId, Aula aula);
 

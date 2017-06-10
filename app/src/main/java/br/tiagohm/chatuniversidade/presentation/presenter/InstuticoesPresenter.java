@@ -81,13 +81,17 @@ public class InstuticoesPresenter extends MvpBasePresenter<InstuticaoContract.Vi
                     public void accept(Pair<Integer, Instituicao> i) throws Exception {
                         //Added
                         if (i.first == 0) {
-                            getView().adicionarInstituicao(i.second);
-                            getView().updateList();
+                            if (isViewAttached()) {
+                                getView().adicionarInstituicao(i.second);
+                                getView().updateList();
+                            }
                         }
                         //Deleted
                         else if (i.first == 2) {
-                            getView().removerInstituicao(i.second);
-                            getView().updateList();
+                            if (isViewAttached()) {
+                                getView().removerInstituicao(i.second);
+                                getView().updateList();
+                            }
                         }
                     }
                 });

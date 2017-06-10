@@ -30,17 +30,13 @@
                 android:inputType="text"
                 android:textColorHint="#7000" />
 
-            <EditText
+            <Spinner
                 android:id="@+id/instituicaoInput"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
                 android:background="#FFF"
-                android:gravity="center"
-                android:hint="Instituição"
-                android:inputType="text"
-                android:textAllCaps="true"
-                android:textColorHint="#7000" />
+                android:gravity="center" />
 
             <Button
                 android:id="@+id/criarButton"

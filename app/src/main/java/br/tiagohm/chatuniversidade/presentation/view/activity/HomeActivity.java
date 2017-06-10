@@ -69,6 +69,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
     @Override
     protected void onResume() {
         super.onResume();
+        mGrupos.clear();
     }
 
     @NonNull
@@ -120,16 +121,15 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
     @OnClick(R.id.novoGrupo)
     public void novoGrupo() {
-        final CriarGrupoDialog dialog = new CriarGrupoDialog(this);
+        final CriarGrupoDialog dialog = new CriarGrupoDialog(this, presenter.getChatManager());
         dialog.exibir()
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
                         if (success) {
-                            if (dialog.mNome.length() > 0 &&
-                                    dialog.mInstituicao.length() > 0) {
+                            if (dialog.mNome.length() > 0) {
                                 presenter.criarGrupo(dialog.mNome.getText().toString(),
-                                        dialog.mInstituicao.getText().toString());
+                                        (String) dialog.mInstituicao.getSelectedItem());
                             } else {
                                 Toast.makeText(HomeActivity.this, "Campos inválidos ou em branco", Toast.LENGTH_SHORT).show();
                             }

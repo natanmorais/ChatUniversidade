@@ -12,11 +12,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
+import com.orhanobut.logger.Logger;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import br.tiagohm.chatuniversidade.R;
 import br.tiagohm.chatuniversidade.model.entity.Aula;
@@ -78,17 +81,31 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
+    private String parseYoutubeVideo(String text) {
+        Logger.d("Entrei no parseYoutubeVideo(" + text + ")");
+        //https://youtu.be/esoijsreit
+        String pattern = "\\(((?:https?:)?//)?((?:www|m)\\.)?((?:youtube\\.com|youtu.be))(/(?:[\\w\\-]+\\?v=|embed/|v/)?)";
+        final Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(text);
+        text = m.replaceAll("@[yt](");
+        return text;
+    }
+
     @OnClick(R.id.novaAula)
     public void novaAula() {
         final CriarAulaDialog dialog = new CriarAulaDialog(this);
+
         dialog.exibir()
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean ok) throws Exception {
                         if (ok) {
+                            String conteudo = parseYoutubeVideo(dialog.mConteudo.getText().toString());
+
                             presenter.novaAula(mGrupo,
                                     dialog.mTitulo.getText().toString(),
-                                    dialog.mConteudo.getText().toString());
+                                    conteudo,
+                                    dialog.mCalendario.getHorizontalCalendar().getSelectedDate().getTime());
                         }
                     }
                 });
@@ -97,6 +114,16 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
     @Override
     public void adicionarAula(Aula aula) {
         mAulas.add(aula);
+    }
+
+    @Override
+    public void atualizarAula(Aula aula) {
+        for (int i = 0; i < mAulas.size(); i++) {
+            if (mAulas.get(i).id.equals(aula.id)) {
+                mAulas.set(i, aula);
+                return;
+            }
+        }
     }
 
     @Override
@@ -156,9 +183,12 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
                             @Override
                             public void accept(Integer flag) throws Exception {
                                 if (flag == 1) {
+                                    String conteudo = parseYoutubeVideo(dialog.mConteudo.getText().toString());
+
                                     presenter.editarAula(mGrupo, aula.id,
                                             dialog.mTitulo.getText().toString(),
-                                            dialog.mConteudo.getText().toString());
+                                            conteudo,
+                                            dialog.mCalendario.getHorizontalCalendar().getSelectedDate().getTime());
                                 } else if (flag == 2) {
                                     presenter.removerAula(mGrupo, aula);
                                 }

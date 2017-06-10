@@ -30,39 +30,54 @@ public class AulasPresenter extends MvpBasePresenter<AulasContract.View>
                     public void accept(Pair<Integer, Aula> aula) throws Exception {
                         //Added
                         if (aula.first == 0) {
-                            getView().adicionarAula(aula.second);
-                            getView().atualizarLista();
+                            if (isViewAttached()) {
+                                getView().adicionarAula(aula.second);
+                                getView().atualizarLista();
+                            }
+                        }
+                        //Changed
+                        else if (aula.first == 1) {
+                            if (isViewAttached()) {
+                                getView().atualizarAula(aula.second);
+                                getView().atualizarLista();
+                            }
                         }
                         //Removed
                         else if (aula.first == 2) {
-                            getView().removerAula(aula.second);
-                            getView().atualizarLista();
+                            if (isViewAttached()) {
+                                getView().removerAula(aula.second);
+                                getView().atualizarLista();
+                            }
                         }
                     }
                 });
     }
 
     @Override
-    public void novaAula(String grupoId, String titulo, String conteudo) {
-        chatManager.criarAula(grupoId, titulo, conteudo)
+    public void novaAula(String grupoId, String titulo, String conteudo, long data) {
+        chatManager.criarAula(grupoId, titulo, conteudo, data)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
                         if (!success) {
-                            getView().showMessage("Erro ao criar a aula");
+                            if (isViewAttached()) {
+                                getView().showMessage("Erro ao criar a aula");
+                            }
                         }
                     }
                 });
     }
 
     @Override
-    public void editarAula(String grupoId, String id, String titulo, String conteudo) {
-        chatManager.editarAula(grupoId, id, titulo, conteudo)
+    public void editarAula(String grupoId, String id, String titulo, String conteudo, long data) {
+        chatManager.editarAula(grupoId, id, titulo, conteudo, data)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
                         if (!success) {
-                            getView().showMessage("Erro ao editar a aula");
+                            if (isViewAttached()) {
+                                getView().showMessage("Erro ao editar a aula");
+                            }
                         }
                     }
                 });

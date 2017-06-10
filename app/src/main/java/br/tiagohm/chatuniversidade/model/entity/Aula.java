@@ -3,7 +3,9 @@ package br.tiagohm.chatuniversidade.model.entity;
 import com.google.firebase.database.Exclude;
 import com.google.gson.annotations.SerializedName;
 
-public class Aula {
+import java.io.Serializable;
+
+public class Aula implements Serializable {
 
     @Exclude
     public transient String id;
@@ -17,8 +19,8 @@ public class Aula {
     public Aula() {
     }
 
-    public Aula(String titulo, String conteudo) {
-        this.data = System.currentTimeMillis();
+    public Aula(String titulo, String conteudo, long data) {
+        this.data = data;
         this.titulo = titulo;
         this.conteudo = conteudo;
     }
@@ -26,6 +28,7 @@ public class Aula {
     @Override
     public String toString() {
         return "Aula {" +
+                "data=" + data +
                 "titulo=" + titulo +
                 ", conteudo='" + conteudo +
                 '}';
@@ -38,15 +41,19 @@ public class Aula {
 
         Aula aula = (Aula) o;
 
+        if (data != aula.data) return false;
+        if (id != null ? !id.equals(aula.id) : aula.id != null) return false;
         if (!titulo.equals(aula.titulo)) return false;
         return conteudo.equals(aula.conteudo);
+
     }
 
     @Override
     public int hashCode() {
-        int result = 0;
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + titulo.hashCode();
         result = 31 * result + conteudo.hashCode();
+        result = 31 * result + (int) (data ^ (data >>> 32));
         return result;
     }
 }

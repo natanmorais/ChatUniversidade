@@ -7,10 +7,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import br.tiagohm.chatuniversidade.R;
 import br.tiagohm.chatuniversidade.model.entity.Aula;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import devs.mulham.horizontalcalendar.HorizontalCalendar;
+import devs.mulham.horizontalcalendar.HorizontalCalendarListener;
+import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -25,6 +31,8 @@ public class EditarAulaDialog extends AlertDialog.Builder {
     public Button mSalvarButton;
     @BindView(R.id.deletarButton)
     public Button mDeletarButton;
+    @BindView(R.id.calendarView)
+    public HorizontalCalendarView mCalendario;
 
     private AlertDialog mDialog;
 
@@ -36,14 +44,24 @@ public class EditarAulaDialog extends AlertDialog.Builder {
 
         ButterKnife.bind(this, view);
 
+        Calendar endDate = Calendar.getInstance();
+        endDate.add(Calendar.MONTH, 6);
+        Calendar startDate = Calendar.getInstance();
+        startDate.add(Calendar.MONTH, -6);
+
+        HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(view, R.id.calendarView)
+                .startDate(startDate.getTime())
+                .endDate(endDate.getTime())
+                .build();
+        horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
+            @Override
+            public void onDateSelected(Date date, int position) {
+            }
+        });
+        horizontalCalendar.selectDate(new Date(aula.data), true);
+        mCalendario.setHorizontalCalendar(horizontalCalendar);
         mTitulo.setText(aula.titulo);
         mConteudo.setText(aula.conteudo);
-    }
-
-    public Aula getAula() {
-        return new Aula(
-                mTitulo.getText().toString(),
-                mConteudo.getText().toString());
     }
 
     public Observable<Integer> exibir() {

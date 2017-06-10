@@ -39,6 +39,11 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
     }
 
     @Override
+    public ChatManager getChatManager() {
+        return chatManager;
+    }
+
+    @Override
     public void deslogar() {
         ChatManager.deslogar();
     }
@@ -51,18 +56,24 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
                     public void accept(Pair<Integer, Grupo> grupo) throws Exception {
                         //Added
                         if (grupo.first == 0) {
-                            getView().adicionarGrupo(grupo.second);
-                            getView().atualizarLista();
+                            if (isViewAttached()) {
+                                getView().adicionarGrupo(grupo.second);
+                                getView().atualizarLista();
+                            }
                         }
                         //Changed.
                         else if (grupo.first == 1) {
-                            getView().atualizarGrupo(grupo.second);
-                            getView().atualizarLista();
+                            if (isViewAttached()) {
+                                getView().atualizarGrupo(grupo.second);
+                                getView().atualizarLista();
+                            }
                         }
                         //Removed
                         else if (grupo.first == 2) {
-                            getView().removerGrupo(grupo.second);
-                            getView().atualizarLista();
+                            if (isViewAttached()) {
+                                getView().removerGrupo(grupo.second);
+                                getView().atualizarLista();
+                            }
                         }
                     }
                 });

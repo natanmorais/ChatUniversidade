@@ -4,6 +4,7 @@ import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
+import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 
 public interface HomeContract {
 
@@ -33,5 +34,7 @@ public interface HomeContract {
         void deletarGrupo(String grupoId);
 
         void monitorarMeusGrupos();
+
+        ChatManager getChatManager();
     }
 }

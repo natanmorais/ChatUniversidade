@@ -36,7 +36,9 @@ public class GrupoPresenter extends MvpBasePresenter<GrupoContract.View>
                     public void accept(Pair<Integer, Conversa> conversa) throws Exception {
                         //Added
                         if (conversa.first == 0) {
-                            getView().adicionarConversa(conversa.second);
+                            if (isViewAttached()) {
+                                getView().adicionarConversa(conversa.second);
+                            }
                         }
                         //Changed.
                         else if (conversa.first == 1) {
@@ -44,7 +46,9 @@ public class GrupoPresenter extends MvpBasePresenter<GrupoContract.View>
                         }
                         //Removed
                         else if (conversa.first == 2) {
-                            getView().removerConversa(conversa.second);
+                            if (isViewAttached()) {
+                                getView().removerConversa(conversa.second);
+                            }
                         }
                     }
                 });
@@ -57,7 +61,9 @@ public class GrupoPresenter extends MvpBasePresenter<GrupoContract.View>
                     @Override
                     public void accept(Boolean success) throws Exception {
                         if (!success) {
-                            getView().showMessage("Erro ao enviar a mensagem!!!");
+                            if (isViewAttached()) {
+                                getView().showMessage("Erro ao enviar a mensagem!!!");
+                            }
                         }
                     }
                 });
