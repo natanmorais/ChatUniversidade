@@ -183,6 +183,8 @@ public class ChatManager
         });
     }
 
+
+
     public static void deslogar() {
         FirebaseAuth.getInstance().signOut();
     }
@@ -760,6 +762,31 @@ public class ChatManager
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
                 CHAT.child("convites").child(convite.id)
                         .removeValue()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void nada) {
+                                e.onNext(true);
+                                e.onComplete();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception ex) {
+                                e.onError(ex);
+                                e.onComplete();
+                            }
+                        });
+            }
+        });
+    }
+
+    public Observable<Boolean> aceitarConvite(final Convite convite) {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                final String id = CHAT.child("grupos").child(getGrupoByName(getGrupos(),convite.nomeGrupo).id).child("usuarios").push().getKey();
+                CHAT.child("grupos").child(getGrupoByName(getGrupos(),convite.nomeGrupo).id).child("usuarios").child(id)
+                        .setValue(getUsuarioByEmail(convite.destinatario))
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void nada) {

@@ -40,13 +40,13 @@ public class ConvitePresenter extends MvpBasePresenter<ConviteContract.View>
 
     @Override
     public void aceitarConvite(Convite convite) {
-        //TODO: Colocar usuário que aceitou o convite no grupo específico
+        aceitarConvite(convite);
         removerConvite(convite);
     }
 
     @Override
     public void removerConvite(Convite convite) {
-        chatManager.deletarConvite(convite.id)
+        chatManager.deletarConvite(convite)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
