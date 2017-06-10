@@ -17,13 +17,11 @@ import javax.inject.Inject;
 
 import br.tiagohm.chatuniversidade.R;
 import br.tiagohm.chatuniversidade.common.App;
-import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.InstuticaoContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.InstuticoesPresenter;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.CriarInstituicaoDialog;
-import br.tiagohm.chatuniversidade.presentation.view.dialog.EditarGrupoDialog;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.EditarInstituicaoDialog;
 import butterknife.BindView;
 import butterknife.ButterKnife;

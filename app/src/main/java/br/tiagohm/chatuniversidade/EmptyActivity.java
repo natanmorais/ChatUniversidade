@@ -3,17 +3,13 @@ package br.tiagohm.chatuniversidade;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import br.tiagohm.chatuniversidade.common.base.BaseActivity;
-import br.tiagohm.chatuniversidade.model.entity.Usuario;
-import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.view.activity.HomeActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.LoginActivity;
-import io.reactivex.functions.Consumer;
 
 public class EmptyActivity extends BaseActivity {
 

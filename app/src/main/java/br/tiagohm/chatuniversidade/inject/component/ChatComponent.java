@@ -11,8 +11,6 @@ import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.InstuticoesPresenter;
 import br.tiagohm.chatuniversidade.presentation.view.activity.AulasActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.ContaActivity;
-import br.tiagohm.chatuniversidade.presentation.view.activity.GrupoActivity;
-import br.tiagohm.chatuniversidade.presentation.view.activity.HomeActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.InstituicoesActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.LoginActivity;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.AcceptConviteDialog;

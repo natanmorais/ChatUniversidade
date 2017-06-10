@@ -1,7 +1,6 @@
 package br.tiagohm.chatuniversidade.presentation.view.activity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
@@ -10,11 +9,8 @@ import android.widget.Toast;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 
-import javax.inject.Inject;
-
 import br.tiagohm.chatuniversidade.R;
 import br.tiagohm.chatuniversidade.common.App;
-import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import br.tiagohm.chatuniversidade.presentation.contract.LoginContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.LoginPresenter;
 import br.tiagohm.chatuniversidade.presentation.view.fragment.EntrarFragment;

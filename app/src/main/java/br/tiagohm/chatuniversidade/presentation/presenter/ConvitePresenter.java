@@ -8,7 +8,6 @@ import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Convite;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.ConviteContract;
-import br.tiagohm.chatuniversidade.presentation.contract.InstuticaoContract;
 import io.reactivex.functions.Consumer;
 
 /**
