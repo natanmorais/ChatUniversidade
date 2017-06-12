@@ -24,6 +24,9 @@
         <activity android:name=".presentation.view.activity.HomeActivity" />
         <activity android:name=".presentation.view.activity.LoginActivity" />
         <activity android:name=".presentation.view.activity.ContaActivity" />
+        <activity android:name=".presentation.view.activity.InstituicoesActivity" />
+        <activity android:name=".presentation.view.activity.GrupoActivity" />
+        <activity android:name=".presentation.view.activity.AulasActivity" />
     </application>
 
 </manifest>

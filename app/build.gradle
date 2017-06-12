@@ -8,7 +8,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
-        versionName "0.1.0"
+        versionName "0.2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -27,7 +27,6 @@ dependencies {
 
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 
     //Butter Knife
@@ -39,6 +38,7 @@ dependencies {
     compile 'com.lapism:searchview:4.0'
     compile 'com.rom4ek:arcnavigationview:1.0.3'
     compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile 'com.github.tiagohm.MarkdownView:library:0.16.0'
     //Dagger
     compile 'com.google.dagger:dagger:2.10'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
