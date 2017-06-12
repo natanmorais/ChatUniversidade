@@ -9,24 +9,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import br.tiagohm.chatuniversidade.R;
-import br.tiagohm.chatuniversidade.common.App;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpActivity;
 import br.tiagohm.chatuniversidade.model.entity.Convite;
 import br.tiagohm.chatuniversidade.presentation.contract.ConviteContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.ConvitePresenter;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.AceitarConviteDialog;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.RevogarConviteDialog;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.reactivex.functions.Consumer;
 
-public class ConvitesActivity extends MvpActivity<ConviteContract.View, ConviteContract.Presenter>
+public class ConvitesActivity extends BaseMvpActivity<ConviteContract.View, ConviteContract.Presenter>
         implements ConviteContract.View {
 
     @BindView(R.id.convitesEnviados)
@@ -41,18 +39,22 @@ public class ConvitesActivity extends MvpActivity<ConviteContract.View, ConviteC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_view_convites);
-
-        ButterKnife.bind(this);
-
-        App.getChatComponent().inject(this);
-
         mConvitesEnviados.setLayoutManager(new LinearLayoutManager(this));
         mConvitesRecebidos.setLayoutManager(new LinearLayoutManager(this));
         mConvitesEnviados.setAdapter(new ConvitesEnviadosAdapter());
         mConvitesRecebidos.setAdapter(new ConvitesRecebidosAdapter());
 
         presenter.obterOsConvites();
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_view_convites;
+    }
+
+    @Override
+    protected String getTitleString() {
+        return "Convites";
     }
 
     @NonNull

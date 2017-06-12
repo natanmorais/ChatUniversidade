@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Aula;
+import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.AulasContract;
 import io.reactivex.functions.Consumer;
@@ -23,6 +24,11 @@ public class AulasPresenter extends MvpBasePresenter<AulasContract.View>
     }
 
     @Override
+    public Usuario getUsuario() {
+        return chatManager.getUsuario();
+    }
+
+    @Override
     public void monitorarAulas(String grupoId) {
         chatManager.monitorarAulas(grupoId)
                 .subscribe(new Consumer<Pair<Integer, Aula>>() {
@@ -32,21 +38,21 @@ public class AulasPresenter extends MvpBasePresenter<AulasContract.View>
                         if (aula.first == 0) {
                             if (isViewAttached()) {
                                 getView().adicionarAula(aula.second);
-                                getView().atualizarLista();
+                                getView().atualizarListaDeAulas();
                             }
                         }
                         //Changed
                         else if (aula.first == 1) {
                             if (isViewAttached()) {
                                 getView().atualizarAula(aula.second);
-                                getView().atualizarLista();
+                                getView().atualizarListaDeAulas();
                             }
                         }
                         //Removed
                         else if (aula.first == 2) {
                             if (isViewAttached()) {
                                 getView().removerAula(aula.second);
-                                getView().atualizarLista();
+                                getView().atualizarListaDeAulas();
                             }
                         }
                     }

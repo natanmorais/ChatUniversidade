@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Convite;
+import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.ConviteContract;
 import io.reactivex.functions.Consumer;
@@ -21,6 +22,11 @@ public class ConvitePresenter extends MvpBasePresenter<ConviteContract.View>
 
     public ConvitePresenter() {
         App.getChatComponent().inject(this);
+    }
+
+    @Override
+    public Usuario getUsuario() {
+        return chatManager.getUsuario();
     }
 
     @Override

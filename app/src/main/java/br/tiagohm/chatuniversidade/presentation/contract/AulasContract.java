@@ -1,28 +1,23 @@
 package br.tiagohm.chatuniversidade.presentation.contract;
 
-import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
-import com.hannesdorfmann.mosby3.mvp.MvpView;
-
-import java.util.List;
-
+import br.tiagohm.chatuniversidade.common.base.BaseMvpPresenter;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpView;
 import br.tiagohm.chatuniversidade.model.entity.Aula;
 
 public interface AulasContract {
 
-    interface View extends MvpView {
-
-        void showMessage(String message);
+    interface View extends BaseMvpView {
 
         void adicionarAula(Aula aula);
 
-        void atualizarLista();
+        void atualizarListaDeAulas();
 
         void removerAula(Aula aula);
 
         void atualizarAula(Aula aula);
     }
 
-    interface Presenter extends MvpPresenter<AulasContract.View> {
+    interface Presenter extends BaseMvpPresenter<View> {
 
         void novaAula(String grupoId, String titulo, String conteudo, long data);
 

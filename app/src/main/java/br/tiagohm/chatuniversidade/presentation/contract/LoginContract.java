@@ -1,11 +1,11 @@
 package br.tiagohm.chatuniversidade.presentation.contract;
 
-import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
-import com.hannesdorfmann.mosby3.mvp.MvpView;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpPresenter;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpView;
 
 public interface LoginContract {
 
-    interface View extends MvpView {
+    interface View extends BaseMvpView {
 
         LoginContract.Presenter getPresenter();
 
@@ -14,11 +14,9 @@ public interface LoginContract {
         void mostrarTelaDeRegistrar();
 
         void mostrarTelaDoUsuario();
-
-        void showMessage(String message);
     }
 
-    interface Presenter extends MvpPresenter<LoginContract.View> {
+    interface Presenter extends BaseMvpPresenter<View> {
 
         void mostrarTelaDeEntrar();
 

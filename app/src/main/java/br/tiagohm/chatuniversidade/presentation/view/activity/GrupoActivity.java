@@ -5,14 +5,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
 import br.tiagohm.chatuniversidade.R;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpActivity;
 import br.tiagohm.chatuniversidade.model.entity.Conversa;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.presentation.contract.GrupoContract;
@@ -20,10 +19,9 @@ import br.tiagohm.chatuniversidade.presentation.presenter.GrupoPresenter;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.ConfirmDialog;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.CriarConviteDialog;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.reactivex.functions.Consumer;
 
-public class GrupoActivity extends MvpActivity<GrupoContract.View, GrupoContract.Presenter>
+public class GrupoActivity extends BaseMvpActivity<GrupoContract.View, GrupoContract.Presenter>
         implements GrupoContract.View {
 
     @BindView(R.id.conversas)
@@ -37,10 +35,6 @@ public class GrupoActivity extends MvpActivity<GrupoContract.View, GrupoContract
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_grupo);
-        setTitle("Grupo");
-
-        ButterKnife.bind(this);
 
         mTextoMensagem.setInputListener(new MessageInput.InputListener() {
             @Override
@@ -49,6 +43,16 @@ public class GrupoActivity extends MvpActivity<GrupoContract.View, GrupoContract
                 return true;
             }
         });
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_grupo;
+    }
+
+    @Override
+    protected String getTitleString() {
+        return "Grupo";
     }
 
     @Override
@@ -75,11 +79,6 @@ public class GrupoActivity extends MvpActivity<GrupoContract.View, GrupoContract
     }
 
     @Override
-    public void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.grupo_menu, menu);
         menu.findItem(R.id.adicionarUsuario).setVisible(!presenter.getUsuario().isUser());
@@ -88,6 +87,8 @@ public class GrupoActivity extends MvpActivity<GrupoContract.View, GrupoContract
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (presenter.getUsuario() == null) return false;
+
         final int id = item.getItemId();
 
         if (id == R.id.verAulas) {

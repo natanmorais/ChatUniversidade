@@ -7,12 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import javax.inject.Inject;
-
 import br.tiagohm.chatuniversidade.R;
-import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
-import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;

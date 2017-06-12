@@ -12,13 +12,13 @@ import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.hannesdorfmann.mosby3.mvp.MvpFragment;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import br.tiagohm.chatuniversidade.R;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpFragment;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.presentation.contract.LoginContract;
 import br.tiagohm.chatuniversidade.presentation.contract.RegistrarContract;
@@ -27,7 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class RegistrarFragment extends MvpFragment<RegistrarContract.View, RegistrarContract.Presenter>
+public class RegistrarFragment extends BaseMvpFragment<RegistrarContract.View, RegistrarContract.Presenter>
         implements RegistrarContract.View {
 
     @BindView(R.id.emailInput)
@@ -109,6 +109,14 @@ public class RegistrarFragment extends MvpFragment<RegistrarContract.View, Regis
     public void queroLogar() {
         Logger.d("queroLogar()");
         presenter.getLoginPresenter().mostrarTelaDeEntrar();
+    }
+
+    @Override
+    public void showMessage(String message) {
+    }
+
+    @Override
+    public void finish() {
     }
 
     private class InstituicaoSpinnerAdapter extends BaseAdapter {

@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
+import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.LoginContract;
 import br.tiagohm.chatuniversidade.presentation.contract.RegistrarContract;
@@ -19,12 +20,18 @@ public class RegistrarPresenter extends MvpBasePresenter<RegistrarContract.View>
 
     @Inject
     ChatManager chatManager;
+
     private LoginContract.Presenter mLoginPresenter;
 
     public RegistrarPresenter(LoginContract.Presenter presenter) {
         mLoginPresenter = presenter;
 
         App.getChatComponent().inject(this);
+    }
+
+    @Override
+    public Usuario getUsuario() {
+        return chatManager.getUsuario();
     }
 
     @Override

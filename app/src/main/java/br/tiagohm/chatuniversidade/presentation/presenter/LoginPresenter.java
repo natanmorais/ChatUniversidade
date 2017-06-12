@@ -3,6 +3,7 @@ package br.tiagohm.chatuniversidade.presentation.presenter;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import com.orhanobut.logger.Logger;
 
+import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.LoginContract;
 
@@ -43,5 +44,10 @@ public class LoginPresenter extends MvpBasePresenter<LoginContract.View>
     public void erroAoRegistrar(String message) {
         getView().showMessage(message);
         ChatManager.deslogar();
+    }
+
+    @Override
+    public Usuario getUsuario() {
+        return null;
     }
 }

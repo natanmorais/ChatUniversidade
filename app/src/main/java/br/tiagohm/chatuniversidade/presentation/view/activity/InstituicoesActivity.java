@@ -11,12 +11,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hannesdorfmann.mosby3.mvp.MvpActivity;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import br.tiagohm.chatuniversidade.R;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpActivity;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.presentation.contract.InstuticaoContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.InstuticoesPresenter;
@@ -27,7 +26,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
 
-public class InstituicoesActivity extends MvpActivity<InstuticaoContract.View, InstuticaoContract.Presenter>
+public class InstituicoesActivity extends BaseMvpActivity<InstuticaoContract.View, InstuticaoContract.Presenter>
         implements InstuticaoContract.View {
 
     private final List<Instituicao> mInstituicoes = new ArrayList<>();
@@ -41,10 +40,6 @@ public class InstituicoesActivity extends MvpActivity<InstuticaoContract.View, I
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_view_instituicoes);
-
-        ButterKnife.bind(this);
-
         if (presenter.getUsuario().tipo != 2) {
             mAdicionarInstituicaoButton.setVisibility(View.GONE);
         }
@@ -52,6 +47,16 @@ public class InstituicoesActivity extends MvpActivity<InstuticaoContract.View, I
         mMinhasInstituicoes.setLayoutManager(new LinearLayoutManager(this));
         mMinhasInstituicoes.setAdapter(new InstituicaoAdapter());
         presenter.monitorarInstituicao();
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_view_instituicoes;
+    }
+
+    @Override
+    protected String getTitleString() {
+        return "Instituições";
     }
 
     @Override

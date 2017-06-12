@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
+import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.ContaContract;
 import io.reactivex.functions.Consumer;
@@ -22,6 +23,11 @@ public class ContaPresenter extends MvpBasePresenter<ContaContract.View>
 
     public ContaPresenter() {
         App.getChatComponent().inject(this);
+    }
+
+    @Override
+    public Usuario getUsuario() {
+        return chatManager.getUsuario();
     }
 
     @Override
@@ -51,18 +57,24 @@ public class ContaPresenter extends MvpBasePresenter<ContaContract.View>
     }
 
     @Override
-    public void deletarConta() {
-        chatManager.deletarConta()
+    public void deletarConta(String password) {
+        if (isViewAttached()) {
+            getView().showProgess(true);
+        }
+
+        chatManager.deletarConta(password)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean success) throws Exception {
                         if (success) {
                             if (isViewAttached()) {
+                                getView().showProgess(false);
                                 getView().showMessage("A conta foi removida com sucesso!");
                                 getView().finish();
                             }
                         } else {
                             if (isViewAttached()) {
+                                getView().showProgess(false);
                                 getView().showMessage("Erro ao remover a conta!");
                             }
                         }

@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.orhanobut.logger.Logger;
 
 import java.text.SimpleDateFormat;
@@ -22,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import br.tiagohm.chatuniversidade.R;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpActivity;
 import br.tiagohm.chatuniversidade.model.entity.Aula;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.presentation.contract.AulasContract;
@@ -34,7 +34,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
 
-public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract.Presenter>
+public class AulasActivity extends BaseMvpActivity<AulasContract.View, AulasContract.Presenter>
         implements AulasContract.View {
 
     private final List<Aula> mAulas = new ArrayList<>();
@@ -47,13 +47,19 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_aulas);
-        setTitle("Aulas");
-
-        ButterKnife.bind(this);
 
         mAulasList.setLayoutManager(new LinearLayoutManager(this));
         mAulasList.setAdapter(new AulasAdapter());
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_aulas;
+    }
+
+    @Override
+    protected String getTitleString() {
+        return "Aula";
     }
 
     @Override
@@ -133,7 +139,7 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
     }
 
     @Override
-    public void atualizarLista() {
+    public void atualizarListaDeAulas() {
         mAulasList.getAdapter().notifyDataSetChanged();
     }
 

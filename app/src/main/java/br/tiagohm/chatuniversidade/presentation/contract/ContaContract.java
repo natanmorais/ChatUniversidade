@@ -1,28 +1,23 @@
 package br.tiagohm.chatuniversidade.presentation.contract;
 
-import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
-import com.hannesdorfmann.mosby3.mvp.MvpView;
-
+import br.tiagohm.chatuniversidade.common.base.BaseMvpPresenter;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpView;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 
 public interface ContaContract {
 
-    interface View extends MvpView {
-
-        void showMessage(String message);
-
-        void finish();
+    interface View extends BaseMvpView {
 
         void adicionarInstituicao(Instituicao instituicao);
 
         void atualizaListaDeInstituicoes();
     }
 
-    interface Presenter extends MvpPresenter<ContaContract.View> {
+    interface Presenter extends BaseMvpPresenter<View> {
 
         void salvarConta(String senha, String instituicao, String nome, String matricula);
 
-        void deletarConta();
+        void deletarConta(String password);
 
         void obterInstituicoes();
     }

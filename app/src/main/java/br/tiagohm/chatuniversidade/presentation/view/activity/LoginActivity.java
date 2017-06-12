@@ -5,19 +5,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.widget.Toast;
-
-import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 
 import br.tiagohm.chatuniversidade.R;
-import br.tiagohm.chatuniversidade.common.App;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpActivity;
 import br.tiagohm.chatuniversidade.presentation.contract.LoginContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.LoginPresenter;
 import br.tiagohm.chatuniversidade.presentation.view.fragment.EntrarFragment;
 import br.tiagohm.chatuniversidade.presentation.view.fragment.RegistrarFragment;
-import butterknife.ButterKnife;
 
-public class LoginActivity extends MvpActivity<LoginContract.View, LoginContract.Presenter>
+public class LoginActivity extends BaseMvpActivity<LoginContract.View, LoginContract.Presenter>
         implements LoginContract.View {
 
     @Override
@@ -26,9 +22,17 @@ public class LoginActivity extends MvpActivity<LoginContract.View, LoginContract
 
         setContentView(R.layout.activity_login);
 
-        ButterKnife.bind(this);
-
         mostrarTelaDeEntrar();
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_login;
+    }
+
+    @Override
+    protected String getTitleString() {
+        return "Login";
     }
 
     @NonNull
@@ -58,10 +62,5 @@ public class LoginActivity extends MvpActivity<LoginContract.View, LoginContract
         Intent i = new Intent(this, HomeActivity.class);
         startActivity(i);
         finish();
-    }
-
-    @Override
-    public void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

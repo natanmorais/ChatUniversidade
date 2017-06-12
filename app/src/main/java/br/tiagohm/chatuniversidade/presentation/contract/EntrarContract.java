@@ -1,15 +1,15 @@
 package br.tiagohm.chatuniversidade.presentation.contract;
 
-import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
-import com.hannesdorfmann.mosby3.mvp.MvpView;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpPresenter;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpView;
 
 public interface EntrarContract {
 
-    interface View extends MvpView {
+    interface View extends BaseMvpView {
 
     }
 
-    interface Presenter extends MvpPresenter<EntrarContract.View> {
+    interface Presenter extends BaseMvpPresenter<View> {
 
         LoginContract.Presenter getLoginPresenter();
 

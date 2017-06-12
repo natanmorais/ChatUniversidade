@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
+import br.tiagohm.chatuniversidade.model.entity.Usuario;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.HomeContract;
 import io.reactivex.functions.Consumer;
@@ -24,6 +25,11 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
     }
 
     @Override
+    public Usuario getUsuario() {
+        return chatManager.getUsuario();
+    }
+
+    @Override
     public void carregar(String email) {
         chatManager.carregar(email)
                 .subscribe(new Consumer<Boolean>() {
@@ -31,16 +37,12 @@ public class HomePresenter extends MvpBasePresenter<HomeContract.View>
                     public void accept(Boolean success) throws Exception {
                         if (success) {
                             monitorarMeusGrupos();
+                            getView().usuarioEncontrado();
                         } else {
                             getView().showMessage("Erro ao carregar o usuário");
                         }
                     }
                 });
-    }
-
-    @Override
-    public ChatManager getChatManager() {
-        return chatManager;
     }
 
     @Override

@@ -15,13 +15,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import br.tiagohm.chatuniversidade.R;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpActivity;
 import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.presentation.contract.HomeContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
@@ -32,7 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
 
-public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Presenter>
+public class HomeActivity extends BaseMvpActivity<HomeContract.View, HomeContract.Presenter>
         implements HomeContract.View, FirebaseAuth.AuthStateListener {
 
     @BindView(R.id.novoGrupo)
@@ -45,13 +45,19 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        setTitle("Meus Grupos");
-
-        ButterKnife.bind(this);
 
         mMeusGrupos.setLayoutManager(new LinearLayoutManager(this));
         mMeusGrupos.setAdapter(new GruposAdapter());
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_home;
+    }
+
+    @Override
+    protected String getTitleString() {
+        return "Grupos";
     }
 
     @Override
@@ -86,6 +92,8 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (presenter.getUsuario() == null) return false;
+
         final int id = item.getItemId();
 
         switch (id) {
@@ -125,7 +133,8 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
 
     @OnClick(R.id.novoGrupo)
     public void novoGrupo() {
-        final CriarGrupoDialog dialog = new CriarGrupoDialog(this, presenter.getChatManager());
+
+        final CriarGrupoDialog dialog = new CriarGrupoDialog(this);
         dialog.exibir()
                 .subscribe(new Consumer<Boolean>() {
                     @Override
@@ -175,11 +184,6 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
     }
 
     @Override
-    public void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     public void adicionarGrupo(Grupo grupo) {
         mGrupos.add(grupo);
     }
@@ -204,6 +208,12 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                 }
             }
         }
+    }
+
+    @Override
+    public void usuarioEncontrado() {
+        mCriarGrupoButton.setVisibility(presenter.getUsuario().isUser() ?
+                View.GONE : View.VISIBLE);
     }
 
     public class GruposAdapter extends RecyclerView.Adapter<GruposAdapter.Holder> {

@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -98,6 +99,12 @@ public class ChatManager {
                                     e.onComplete();
                                 }
                             }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
                         });
             }
         });
@@ -143,6 +150,12 @@ public class ChatManager {
                                                         }
                                                     });
                                 }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
                             }
                         });
             }
@@ -239,34 +252,53 @@ public class ChatManager {
     /**
      * Remove a conta.
      */
-    public Observable<Boolean> deletarConta() {
+    public Observable<Boolean> deletarConta(final String password) {
         Logger.d("deletarConta()");
 
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                user.delete()
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                user.reauthenticate(EmailAuthProvider
+                        .getCredential(user.getEmail(), password))
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Logger.d("A conta foi deletada");
-                                    CHAT.child("usuarios").child(mUsuario.id)
-                                            .removeValue()
+                                    user.delete()
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
-                                                        mUsuario = null;
                                                         Logger.d("A conta foi deletada");
-                                                        e.onNext(true);
-                                                        e.onComplete();
+                                                        CHAT.child("usuarios").child(mUsuario.id)
+                                                                .removeValue()
+                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                        if (task.isSuccessful()) {
+                                                                            mUsuario = null;
+                                                                            Logger.d("A conta foi deletada");
+                                                                            e.onNext(true);
+                                                                            e.onComplete();
+                                                                        } else {
+                                                                            Logger.d("Erro ao deletar a conta");
+                                                                            e.onNext(false);
+                                                                            e.onComplete();
+                                                                        }
+                                                                    }
+                                                                });
                                                     } else {
                                                         Logger.d("Erro ao deletar a conta");
                                                         e.onNext(false);
                                                         e.onComplete();
                                                     }
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    e.printStackTrace();
                                                 }
                                             });
                                 } else {
@@ -306,6 +338,12 @@ public class ChatManager {
                                     e.onComplete();
                                 }
                             }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
                         });
             }
         });
@@ -337,6 +375,12 @@ public class ChatManager {
                                     e.onNext(false);
                                     e.onComplete();
                                 }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
                             }
                         });
             }
@@ -374,6 +418,12 @@ public class ChatManager {
                                     e.onComplete();
                                 }
                             }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
                         });
             }
         });
@@ -402,6 +452,12 @@ public class ChatManager {
                                     e.onNext(false);
                                     e.onComplete();
                                 }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
                             }
                         });
             }
@@ -432,6 +488,12 @@ public class ChatManager {
                                     e.onComplete();
                                 }
                             }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
                         });
             }
         });
@@ -460,6 +522,12 @@ public class ChatManager {
                                     e.onComplete();
                                 }
                             }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
                         });
             }
         });
@@ -486,6 +554,12 @@ public class ChatManager {
                                     e.onNext(false);
                                     e.onComplete();
                                 }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
                             }
                         });
             }
@@ -562,6 +636,12 @@ public class ChatManager {
                                     e.onComplete();
                                 }
                             }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
                         });
             }
         });
@@ -592,6 +672,12 @@ public class ChatManager {
                                     e.onComplete();
                                 }
                             }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
                         });
             }
         });
@@ -618,6 +704,12 @@ public class ChatManager {
                                     e.onNext(false);
                                     e.onComplete();
                                 }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
                             }
                         });
             }
@@ -695,6 +787,12 @@ public class ChatManager {
                                     e.onComplete();
                                 }
                             }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
                         });
             }
         });
@@ -724,6 +822,12 @@ public class ChatManager {
                                     e.onComplete();
                                 }
                             }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
                         });
             }
         });
@@ -750,6 +854,12 @@ public class ChatManager {
                                     e.onNext(false);
                                     e.onComplete();
                                 }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
                             }
                         });
             }
@@ -849,6 +959,12 @@ public class ChatManager {
                                     e.onNext(false);
                                     e.onComplete();
                                 }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
                             }
                         });
             }
@@ -976,6 +1092,12 @@ public class ChatManager {
                                     e.onComplete();
                                 }
                             }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
                         });
             }
         });
@@ -1002,6 +1124,12 @@ public class ChatManager {
                                     e.onNext(false);
                                     e.onComplete();
                                 }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
                             }
                         });
             }

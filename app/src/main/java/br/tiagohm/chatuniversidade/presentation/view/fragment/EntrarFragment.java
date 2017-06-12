@@ -12,6 +12,7 @@ import com.hannesdorfmann.mosby3.mvp.MvpFragment;
 import com.orhanobut.logger.Logger;
 
 import br.tiagohm.chatuniversidade.R;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpFragment;
 import br.tiagohm.chatuniversidade.presentation.contract.EntrarContract;
 import br.tiagohm.chatuniversidade.presentation.contract.LoginContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.EntrarPresenter;
@@ -19,7 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class EntrarFragment extends MvpFragment<EntrarContract.View, EntrarContract.Presenter>
+public class EntrarFragment extends BaseMvpFragment<EntrarContract.View, EntrarContract.Presenter>
         implements EntrarContract.View {
 
     @BindView(R.id.emailInput)
@@ -67,5 +68,13 @@ public class EntrarFragment extends MvpFragment<EntrarContract.View, EntrarContr
     public void queroCriarConta() {
         Logger.d("queroCriarConta()");
         presenter.getLoginPresenter().mostrarTelaDeRegistrar();
+    }
+
+    @Override
+    public void showMessage(String message) {
+    }
+
+    @Override
+    public void finish() {
     }
 }

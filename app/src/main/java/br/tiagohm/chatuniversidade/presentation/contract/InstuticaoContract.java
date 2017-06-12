@@ -1,15 +1,12 @@
 package br.tiagohm.chatuniversidade.presentation.contract;
 
-import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
-import com.hannesdorfmann.mosby3.mvp.MvpView;
-
-import br.tiagohm.chatuniversidade.model.entity.Grupo;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpPresenter;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpView;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
-import br.tiagohm.chatuniversidade.model.entity.Usuario;
 
 public interface InstuticaoContract {
 
-    interface View extends MvpView {
+    interface View extends BaseMvpView {
 
         void updateList();
 
@@ -18,7 +15,7 @@ public interface InstuticaoContract {
         void removerInstituicao(Instituicao instituicao);
     }
 
-    interface Presenter extends MvpPresenter<InstuticaoContract.View> {
+    interface Presenter extends BaseMvpPresenter<View> {
 
         void novaInstituicao(String sigla, String nome, String endereco, String telefone, String email);
 
@@ -27,7 +24,5 @@ public interface InstuticaoContract {
         void removerInstituicao(Instituicao instituicao);
 
         void monitorarInstituicao();
-
-        Usuario getUsuario();
     }
 }

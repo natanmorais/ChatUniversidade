@@ -10,29 +10,22 @@ import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
-
-import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import br.tiagohm.chatuniversidade.R;
-import br.tiagohm.chatuniversidade.common.App;
+import br.tiagohm.chatuniversidade.common.base.BaseMvpActivity;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.entity.Usuario;
-import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import br.tiagohm.chatuniversidade.presentation.contract.ContaContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.ContaPresenter;
-import br.tiagohm.chatuniversidade.presentation.view.dialog.ConfirmDialog;
+import br.tiagohm.chatuniversidade.presentation.view.dialog.ConfirmDeleteAccountDialog;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
 
-public class ContaActivity extends MvpActivity<ContaContract.View, ContaContract.Presenter>
+public class ContaActivity extends BaseMvpActivity<ContaContract.View, ContaContract.Presenter>
         implements ContaContract.View {
 
     @BindView(R.id.emailInput)
@@ -47,27 +40,29 @@ public class ContaActivity extends MvpActivity<ContaContract.View, ContaContract
     EditText mMatricula;
     @BindView(R.id.souProfessorCb)
     CheckBox mSouProfessor;
-    @Inject
-    ChatManager chatManager;
 
     private List<Instituicao> mInstituicoes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
 
-        setContentView(R.layout.activity_conta);
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_conta;
+    }
 
-        ButterKnife.bind(this);
-
-        App.getChatComponent().inject(this);
+    @Override
+    protected String getTitleString() {
+        return "Minha Conta";
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        Usuario usuario = chatManager.getUsuario();
+        Usuario usuario = presenter.getUsuario();
         if (usuario != null) {
             mEmail.setText(usuario.email);
             mNome.setText(usuario.nome);
@@ -95,26 +90,22 @@ public class ContaActivity extends MvpActivity<ContaContract.View, ContaContract
 
     @OnClick(R.id.deletarButton)
     public void deletarConta() {
-        new ConfirmDialog(this, "Você deseja remover sua conta?")
-                .exibir()
+        final ConfirmDeleteAccountDialog dialog =
+                new ConfirmDeleteAccountDialog(this, "Você deseja remover sua conta?");
+        dialog.exibir()
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean sim) throws Exception {
                         if (sim) {
-                            presenter.deletarConta();
+                            presenter.deletarConta(dialog.mSenhaDeConfirmacao.getText().toString());
                         }
                     }
                 });
     }
 
     @Override
-    public void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     public void adicionarInstituicao(Instituicao instituicao) {
-        if (instituicao.nome.equals(chatManager.getUsuario().instituicao)) {
+        if (instituicao.nome.equals(presenter.getUsuario().instituicao)) {
             mInstituicao.setSelection(mInstituicoes.size());
         }
         mInstituicoes.add(instituicao);

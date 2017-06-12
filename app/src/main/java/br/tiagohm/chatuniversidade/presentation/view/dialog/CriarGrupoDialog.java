@@ -15,7 +15,10 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import br.tiagohm.chatuniversidade.R;
+import br.tiagohm.chatuniversidade.common.App;
 import br.tiagohm.chatuniversidade.model.entity.Instituicao;
 import br.tiagohm.chatuniversidade.model.repository.ChatManager;
 import butterknife.BindView;
@@ -27,21 +30,25 @@ import io.reactivex.functions.Consumer;
 
 public class CriarGrupoDialog extends AlertDialog.Builder {
 
+    private final List<Instituicao> mInstituicoes = new ArrayList<>();
+
     @BindView(R.id.instituicaoInput)
     public Spinner mInstituicao;
     @BindView(R.id.nomeInput)
     public EditText mNome;
     @BindView(R.id.criarButton)
     public Button mCriarButton;
-
+    @Inject
+    ChatManager chatManager;
     private AlertDialog mDialog;
-    private List<Instituicao> mInstituicoes = new ArrayList<>();
 
-    public CriarGrupoDialog(Context context, ChatManager chatManager) {
+    public CriarGrupoDialog(Context context) {
         super(context);
 
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_criar_grupo, null, false);
         setView(view);
+
+        App.getChatComponent().inject(this);
 
         ButterKnife.bind(this, view);
 
