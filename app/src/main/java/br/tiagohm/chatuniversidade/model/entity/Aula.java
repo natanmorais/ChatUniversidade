@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class Aula implements Serializable {
 
     @Exclude
-    public transient String id;
+    public String id;
     @SerializedName("titulo")
     public String titulo;
     @SerializedName("conteudo")

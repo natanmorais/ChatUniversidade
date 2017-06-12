@@ -21,7 +21,6 @@ import com.orhanobut.logger.Logger;
 
 import java.util.regex.Pattern;
 
-import br.tiagohm.chatuniversidade.common.utils.Utils;
 import br.tiagohm.chatuniversidade.model.entity.Aula;
 import br.tiagohm.chatuniversidade.model.entity.Conversa;
 import br.tiagohm.chatuniversidade.model.entity.Convite;
@@ -57,7 +56,8 @@ public class ChatManager {
         return Observable.create(new ObservableOnSubscribe<Usuario>() {
             @Override
             public void subscribe(final ObservableEmitter<Usuario> e) throws Exception {
-                CHAT.child("usuarios").child(Utils.gerarHash(email))
+                final String id = CHAT.child("usuarios").push().getKey();
+                CHAT.child("usuarios").child(id)
                         .setValue(usuario)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -155,19 +155,18 @@ public class ChatManager {
         return Observable.create(new ObservableOnSubscribe<Usuario>() {
             @Override
             public void subscribe(final ObservableEmitter<Usuario> e) throws Exception {
-                CHAT.child("usuarios").child(Utils.gerarHash(email))
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                Logger.d("Usuario encontrado");
-                                e.onNext(dataSnapshot.getValue(Usuario.class));
-                                e.onComplete();
-                            }
+                CHAT.child("usuarios").orderByChild("email")
+                        .equalTo(email)
+                        .addChildEventListener(new ChildEventAdapter<Usuario>(Usuario.class) {
 
                             @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                Logger.d("Usuario nao encontrado");
-                                e.onError(databaseError.toException());
+                            public void onChild(int operation, Usuario data, String id, String s) {
+                                if (operation == 0) {
+                                    data.id = id;
+                                    Logger.d("Usuario encontrado: %s", data);
+                                    e.onNext(data);
+                                    e.onComplete();
+                                }
                             }
                         });
             }
@@ -179,6 +178,32 @@ public class ChatManager {
      */
     public static void deslogar() {
         FirebaseAuth.getInstance().signOut();
+    }
+
+    public static Observable<Grupo> getGroupByName(final String groupName) {
+        Logger.d("getGroupByName(%s)", groupName);
+
+        return Observable.create(new ObservableOnSubscribe<Grupo>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Grupo> e) throws Exception {
+                CHAT.child("grupos").orderByChild("nome")
+                        .equalTo(groupName)
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                Grupo grupo = dataSnapshot.getValue(Grupo.class);
+                                grupo.id = dataSnapshot.getKey();
+                                e.onNext(grupo);
+                                e.onComplete();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                e.onError(databaseError.toException());
+                            }
+                        });
+            }
+        });
     }
 
     public Observable<Boolean> carregar(final String email) {
@@ -227,7 +252,7 @@ public class ChatManager {
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
                                     Logger.d("A conta foi deletada");
-                                    CHAT.child("usuarios").child(Utils.gerarHash(getUsuario().email))
+                                    CHAT.child("usuarios").child(mUsuario.id)
                                             .removeValue()
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
@@ -298,7 +323,7 @@ public class ChatManager {
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
-                CHAT.child("usuarios").child(Utils.gerarHash(getUsuario().email))
+                CHAT.child("usuarios").child(mUsuario.id)
                         .setValue(mUsuario)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -358,10 +383,12 @@ public class ChatManager {
      * Adiciona um usuario ao grupo.
      */
     public Observable<Boolean> adicionarUsuarioAoGrupo(final String grupoId, final Usuario usuario) {
+        Logger.d("adicionarUsuarioAoGrupo(%s, %s)", grupoId, usuario);
+
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
-                CHAT.child("grupos").child(grupoId).child("usuarios").child(usuario.getIdAsHash())
+                CHAT.child("grupos").child(grupoId).child("usuarios").child(usuario.id)
                         .setValue(usuario) //ou true?
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -372,6 +399,35 @@ public class ChatManager {
                                     e.onComplete();
                                 } else {
                                     Logger.d("Erro ao adicionar o usuario ao grupo");
+                                    e.onNext(false);
+                                    e.onComplete();
+                                }
+                            }
+                        });
+            }
+        });
+    }
+
+    /**
+     * Remove um usuario ao grupo.
+     */
+    public Observable<Boolean> removerUsuarioDoGrupo(final String grupoId, final Usuario usuario) {
+        Logger.d("adicionarUsuarioAoGrupo(%s, %s)", grupoId, usuario);
+
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> e) throws Exception {
+                CHAT.child("grupos").child(grupoId).child("usuarios").child(usuario.id)
+                        .removeValue()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Logger.d("Usuario removido do grupo");
+                                    e.onNext(true);
+                                    e.onComplete();
+                                } else {
+                                    Logger.d("Erro ao remover o usuario ao grupo");
                                     e.onNext(false);
                                     e.onComplete();
                                 }
@@ -754,46 +810,15 @@ public class ChatManager {
             @Override
             public void subscribe(final ObservableEmitter<Pair<Integer, Grupo>> e) throws Exception {
                 CHAT.child("grupos")
-                        .addChildEventListener(new ChildEventListener() {
+                        .addChildEventListener(new ChildEventAdapter<Grupo>(Grupo.class) {
                             @Override
-                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                Grupo grupo = dataSnapshot.getValue(Grupo.class);
-                                if (grupo.admin.equals(mUsuario)) {
-                                    grupo.id = dataSnapshot.getKey();
-                                    e.onNext(new Pair<>(0, grupo));
+                            public void onChild(int operation, Grupo data, String id, String s) {
+                                data.id = id;
+                                Logger.d("grupo: %s", data);
+                                if (data.admin.equals(mUsuario) ||
+                                        (data.usuarios != null && data.usuarios.containsKey(mUsuario.id))) {
+                                    e.onNext(new Pair<>(operation, data));
                                 }
-                            }
-
-                            @Override
-                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                                Grupo grupo = dataSnapshot.getValue(Grupo.class);
-                                if (grupo.admin.equals(mUsuario)) {
-                                    grupo.id = dataSnapshot.getKey();
-                                    e.onNext(new Pair<>(1, grupo));
-                                }
-                            }
-
-                            @Override
-                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                                Grupo grupo = dataSnapshot.getValue(Grupo.class);
-                                if (grupo.admin.equals(mUsuario)) {
-                                    grupo.id = dataSnapshot.getKey();
-                                    e.onNext(new Pair<>(2, grupo));
-                                }
-                            }
-
-                            @Override
-                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                                Grupo grupo = dataSnapshot.getValue(Grupo.class);
-                                if (grupo.admin.equals(mUsuario)) {
-                                    grupo.id = dataSnapshot.getKey();
-                                    e.onNext(new Pair<>(3, grupo));
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                e.onError(databaseError.toException());
                             }
                         });
             }
@@ -835,6 +860,8 @@ public class ChatManager {
     }
 
     public Observable<Pair<Integer, Convite>> monitorarConvitesRemetente(final String emailDoUsuario) {
+        Logger.d("monitorarConvitesRemetente(%s)", emailDoUsuario);
+
         return Observable.create(new ObservableOnSubscribe<Pair<Integer, Convite>>() {
             @Override
             public void subscribe(final ObservableEmitter<Pair<Integer, Convite>> e) throws Exception {
@@ -879,6 +906,8 @@ public class ChatManager {
     }
 
     public Observable<Pair<Integer, Convite>> monitorarConvitesDestinatario(final String emailDoUsuario) {
+        Logger.d("monitorarConvitesDestinatario(%s)", emailDoUsuario);
+
         return Observable.create(new ObservableOnSubscribe<Pair<Integer, Convite>>() {
             @Override
             public void subscribe(final ObservableEmitter<Pair<Integer, Convite>> e) throws Exception {
@@ -926,7 +955,7 @@ public class ChatManager {
      * Cria um convite.
      */
     public Observable<Boolean> criarConvite(final Grupo grupo, String remetente, String destinatario) {
-        final Convite convite = new Convite(grupo, remetente, destinatario);
+        final Convite convite = new Convite(grupo.id, grupo.nome, remetente, destinatario);
 
         return Observable.create(new ObservableOnSubscribe<java.lang.Boolean>() {
             @Override
@@ -983,10 +1012,47 @@ public class ChatManager {
      * Aceita um convite.
      */
     public Observable<Boolean> aceitarConvite(final Convite convite) {
-        return adicionarUsuarioAoGrupo(convite.grupo.id, mUsuario);
+        Logger.d("aceitarConvite");
+        return adicionarUsuarioAoGrupo(convite.grupo, mUsuario);
     }
 
     public Observable<Boolean> alterarAdminDoGrupo(final Grupo grupo, Usuario admin) {
         return null;
+    }
+
+    public static abstract class ChildEventAdapter<T> implements ChildEventListener {
+
+        private final Class<T> type;
+
+        public ChildEventAdapter(Class<T> type) {
+            this.type = type;
+        }
+
+        public abstract void onChild(int operation, T data, String id, String s);
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            onChild(0, dataSnapshot.getValue(type), dataSnapshot.getKey(), s);
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            onChild(1, dataSnapshot.getValue(type), dataSnapshot.getKey(), s);
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            onChild(2, dataSnapshot.getValue(type), dataSnapshot.getKey(), null);
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            onChild(3, dataSnapshot.getValue(type), dataSnapshot.getKey(), s);
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
     }
 }

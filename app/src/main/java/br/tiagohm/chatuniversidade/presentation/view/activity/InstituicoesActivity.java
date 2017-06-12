@@ -88,7 +88,7 @@ public class InstituicoesActivity extends MvpActivity<InstuticaoContract.View, I
                     @Override
                     public void accept(Boolean success) throws Exception {
                         presenter.novaInstituicao(
-                                dialog.mSigla.getText().toString(),
+                                dialog.mSigla.getText().toString().toUpperCase(),
                                 dialog.mNome.getText().toString(),
                                 dialog.mEndereco.getText().toString(),
                                 dialog.mTelefone.getText().toString(),
@@ -172,11 +172,10 @@ public class InstituicoesActivity extends MvpActivity<InstuticaoContract.View, I
 
                 ButterKnife.bind(this, mView);
 
-                mView.setOnLongClickListener(new View.OnLongClickListener() {
+                mView.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public boolean onLongClick(View v) {
+                    public void onClick(View v) {
                         editarInstituicao((Instituicao) mView.getTag());
-                        return true;
                     }
                 });
             }

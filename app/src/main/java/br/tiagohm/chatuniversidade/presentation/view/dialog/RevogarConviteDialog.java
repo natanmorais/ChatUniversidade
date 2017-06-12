@@ -19,9 +19,6 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 
-/**
- * Created by root on 08/06/17.
- */
 public class RevogarConviteDialog extends AlertDialog.Builder {
 
     @BindView(R.id.nomeGrupo)
@@ -48,7 +45,7 @@ public class RevogarConviteDialog extends AlertDialog.Builder {
 
         App.getChatComponent().inject(this);
 
-        mNomeGrupo.setText(mConvite.grupo.nome);
+        mNomeGrupo.setText(mConvite.nomeDoGrupo);
         mEmail.setText(mConvite.destinatario);
     }
 

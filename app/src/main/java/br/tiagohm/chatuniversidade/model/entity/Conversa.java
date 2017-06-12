@@ -11,7 +11,7 @@ import java.util.Date;
 public class Conversa implements Serializable, IMessage {
 
     @Exclude
-    public transient String id;
+    public String id;
     @SerializedName("usuario")
     public Usuario usuario;
     @SerializedName("texto")

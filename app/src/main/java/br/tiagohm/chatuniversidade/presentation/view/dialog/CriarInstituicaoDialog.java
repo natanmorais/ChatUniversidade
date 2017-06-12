@@ -41,15 +41,6 @@ public class CriarInstituicaoDialog extends AlertDialog.Builder {
         ButterKnife.bind(this, view);
     }
 
-    public Instituicao getInstituicao() {
-        return new Instituicao(
-                mSigla.getText().toString(),
-                mNome.getText().toString(),
-                mEndereco.getText().toString(),
-                mTelefone.getText().toString(),
-                mEmail.getText().toString());
-    }
-
     public Observable<Boolean> exibir() {
         return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override

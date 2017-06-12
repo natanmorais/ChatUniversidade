@@ -120,7 +120,7 @@ public class RegistrarFragment extends MvpFragment<RegistrarContract.View, Regis
 
         @Override
         public Object getItem(int position) {
-            return mInstituicoes.get(position).nome;
+            return mInstituicoes.get(position).sigla;
         }
 
         @Override

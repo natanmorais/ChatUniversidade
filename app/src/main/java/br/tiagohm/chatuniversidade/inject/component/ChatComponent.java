@@ -10,12 +10,9 @@ import br.tiagohm.chatuniversidade.presentation.presenter.GrupoPresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.HomePresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.InstuticoesPresenter;
 import br.tiagohm.chatuniversidade.presentation.presenter.RegistrarPresenter;
-import br.tiagohm.chatuniversidade.presentation.view.activity.AulasActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.ContaActivity;
 import br.tiagohm.chatuniversidade.presentation.view.activity.ConvitesActivity;
-import br.tiagohm.chatuniversidade.presentation.view.activity.InstituicoesActivity;
-import br.tiagohm.chatuniversidade.presentation.view.activity.LoginActivity;
-import br.tiagohm.chatuniversidade.presentation.view.dialog.AcceptConviteDialog;
+import br.tiagohm.chatuniversidade.presentation.view.dialog.AceitarConviteDialog;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.EditarGrupoDialog;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.RevogarConviteDialog;
 import dagger.Component;
@@ -40,7 +37,7 @@ public interface ChatComponent {
 
     void inject(RevogarConviteDialog dialog);
 
-    void inject(AcceptConviteDialog dialog);
+    void inject(AceitarConviteDialog dialog);
 
     void inject(ConvitePresenter presenter);
 

@@ -34,10 +34,14 @@ public class ContaPresenter extends MvpBasePresenter<ContaContract.View>
                         @Override
                         public void accept(Boolean success) throws Exception {
                             if (success) {
-                                getView().showMessage("A senha foi alterado com sucesso!");
-                                salvarUsuario(instituicao, nome, matricula);
+                                if (isViewAttached()) {
+                                    getView().showMessage("A senha foi alterado com sucesso!");
+                                    salvarUsuario(instituicao, nome, matricula);
+                                }
                             } else {
-                                getView().showMessage("Erro ao alterar a senha!");
+                                if (isViewAttached()) {
+                                    getView().showMessage("Erro ao alterar a senha!");
+                                }
                             }
                         }
                     });
@@ -53,10 +57,14 @@ public class ContaPresenter extends MvpBasePresenter<ContaContract.View>
                     @Override
                     public void accept(Boolean success) throws Exception {
                         if (success) {
-                            getView().showMessage("A conta foi removida com sucesso!");
-                            getView().finish();
+                            if (isViewAttached()) {
+                                getView().showMessage("A conta foi removida com sucesso!");
+                                getView().finish();
+                            }
                         } else {
-                            getView().showMessage("Erro ao remover a conta!");
+                            if (isViewAttached()) {
+                                getView().showMessage("Erro ao remover a conta!");
+                            }
                         }
                     }
                 });
@@ -69,10 +77,14 @@ public class ContaPresenter extends MvpBasePresenter<ContaContract.View>
                     @Override
                     public void accept(Boolean success) throws Exception {
                         if (success) {
-                            getView().showMessage("A conta foi atualizada com sucesso!");
-                            getView().finish();
+                            if (isViewAttached()) {
+                                getView().showMessage("A conta foi atualizada com sucesso!");
+                                getView().finish();
+                            }
                         } else {
-                            getView().showMessage("Erro ao atualizar a conta!");
+                            if (isViewAttached()) {
+                                getView().showMessage("Erro ao atualizar a conta!");
+                            }
                         }
                     }
                 });
@@ -85,8 +97,10 @@ public class ContaPresenter extends MvpBasePresenter<ContaContract.View>
                     @Override
                     public void accept(Pair<Integer, Instituicao> i) throws Exception {
                         if (i.first == 0) {
-                            getView().adicionarInstituicao(i.second);
-                            getView().atualizaListaDeInstituicoes();
+                            if (isViewAttached()) {
+                                getView().adicionarInstituicao(i.second);
+                                getView().atualizaListaDeInstituicoes();
+                            }
                         }
                     }
                 });

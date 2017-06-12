@@ -2,8 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/adicionarUsuario"
+        android:icon="@drawable/add_user"
+        android:title="Adicionar Usuário"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/verAulas"
         android:icon="@drawable/classroom"
         android:title="Aulas"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/sairDoGrupo"
+        android:icon="@drawable/exit"
+        android:title="Sair do Grupo"
         app:showAsAction="always" />
 </menu>

@@ -10,7 +10,7 @@ public class Utils {
     }
 
     @NonNull
-    public static String gerarHash(String text) {
+    private static String gerarHash(String text) {
         try {
             byte[] hashBytes = MessageDigest.getInstance("MD5").digest(text.getBytes());
             StringBuilder sb = new StringBuilder(hashBytes.length * 2);

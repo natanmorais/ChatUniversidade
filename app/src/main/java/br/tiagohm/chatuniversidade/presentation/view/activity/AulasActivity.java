@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import br.tiagohm.chatuniversidade.R;
 import br.tiagohm.chatuniversidade.model.entity.Aula;
+import br.tiagohm.chatuniversidade.model.entity.Grupo;
 import br.tiagohm.chatuniversidade.presentation.contract.AulasContract;
 import br.tiagohm.chatuniversidade.presentation.presenter.AulasPresenter;
 import br.tiagohm.chatuniversidade.presentation.view.dialog.CriarAulaDialog;
@@ -41,7 +42,7 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
     FloatingActionButton mCriarGrupoButton;
     @BindView(R.id.minhasAulas)
     RecyclerView mAulasList;
-    private String mGrupo;
+    private Grupo mGrupo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +61,14 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
         super.onResume();
 
         if (getIntent() != null && getIntent().hasExtra("GRUPO")) {
-            mGrupo = (String) getIntent().getSerializableExtra("GRUPO");
+            mGrupo = (Grupo) getIntent().getSerializableExtra("GRUPO");
         }
 
         if (mGrupo == null) {
             finish();
         }
 
-        presenter.monitorarAulas(mGrupo);
+        presenter.monitorarAulas(mGrupo.id);
     }
 
     @NonNull
@@ -102,7 +103,7 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
                         if (ok) {
                             String conteudo = parseYoutubeVideo(dialog.mConteudo.getText().toString());
 
-                            presenter.novaAula(mGrupo,
+                            presenter.novaAula(mGrupo.id,
                                     dialog.mTitulo.getText().toString(),
                                     conteudo,
                                     dialog.mCalendario.getHorizontalCalendar().getSelectedDate().getTime());
@@ -185,12 +186,12 @@ public class AulasActivity extends MvpActivity<AulasContract.View, AulasContract
                                 if (flag == 1) {
                                     String conteudo = parseYoutubeVideo(dialog.mConteudo.getText().toString());
 
-                                    presenter.editarAula(mGrupo, aula.id,
+                                    presenter.editarAula(mGrupo.id, aula.id,
                                             dialog.mTitulo.getText().toString(),
                                             conteudo,
                                             dialog.mCalendario.getHorizontalCalendar().getSelectedDate().getTime());
                                 } else if (flag == 2) {
-                                    presenter.removerAula(mGrupo, aula);
+                                    presenter.removerAula(mGrupo.id, aula);
                                 }
                             }
                         });

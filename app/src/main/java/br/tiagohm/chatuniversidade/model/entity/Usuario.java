@@ -6,13 +6,13 @@ import com.stfalcon.chatkit.commons.models.IUser;
 
 import java.io.Serializable;
 
-import br.tiagohm.chatuniversidade.common.utils.Utils;
-
 /**
  * Representa um usuário logado dentro do sistema.
  */
 public class Usuario implements Serializable, IUser {
 
+    @Exclude
+    public String id;
     @SerializedName("instituicao")
     public String instituicao;
     @SerializedName("nome")
@@ -39,7 +39,8 @@ public class Usuario implements Serializable, IUser {
     @Override
     public String toString() {
         return "Usuario {" +
-                "instituicao='" + instituicao + '\'' +
+                "id='" + id + '\'' +
+                ", instituicao='" + instituicao + '\'' +
                 ", nome='" + nome + '\'' +
                 ", tipo=" + tipo +
                 ", matricula='" + matricula + '\'' +
@@ -66,8 +67,18 @@ public class Usuario implements Serializable, IUser {
     }
 
     @Exclude
-    public String getIdAsHash() {
-        return Utils.gerarHash(email);
+    public boolean isProfessor() {
+        return tipo == 1;
+    }
+
+    @Exclude
+    public boolean isAdmin() {
+        return tipo == 2;
+    }
+
+    @Exclude
+    public boolean isUser() {
+        return tipo == 0;
     }
 
     @Override

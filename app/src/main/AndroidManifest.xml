@@ -41,6 +41,9 @@
         <activity
             android:name=".presentation.view.activity.AulasActivity"
             android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".presentation.view.activity.ConvitesActivity"
+            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>

@@ -100,6 +100,10 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
             case R.id.sair:
                 presenter.deslogar();
                 break;
+            case R.id.verConvites:
+                Intent c = new Intent(this, ConvitesActivity.class);
+                startActivity(c);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -249,7 +253,7 @@ public class HomeActivity extends MvpActivity<HomeContract.View, HomeContract.Pr
                     @Override
                     public void onClick(View v) {
                         Intent i = new Intent(HomeActivity.this, GrupoActivity.class);
-                        i.putExtra("GRUPO", ((Grupo) mView.getTag()).id);
+                        i.putExtra("GRUPO", (Grupo) mView.getTag());
                         startActivity(i);
                     }
                 });

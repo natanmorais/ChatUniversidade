@@ -4,13 +4,12 @@ import com.google.firebase.database.Exclude;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class Grupo implements Serializable {
 
     @Exclude
-    public transient String id;
+    public String id;
     @SerializedName("admin")
     public Usuario admin;
     @SerializedName("instituicao")
@@ -19,6 +18,8 @@ public class Grupo implements Serializable {
     public String nome;
     @SerializedName("tipo")
     public int tipo;
+    @SerializedName("usuarios")
+    public HashMap<String, Usuario> usuarios = new HashMap<>();
 
     public Grupo() {
     }
@@ -32,11 +33,13 @@ public class Grupo implements Serializable {
 
     @Override
     public String toString() {
-        return "Grupo {" +
-                "admin=" + admin +
+        return "Grupo{" +
+                "id='" + id + '\'' +
+                ", admin=" + admin +
                 ", instituicao='" + instituicao + '\'' +
                 ", nome='" + nome + '\'' +
                 ", tipo=" + tipo +
+                ", usuarios=" + usuarios +
                 '}';
     }
 

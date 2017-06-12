@@ -10,19 +10,27 @@ public interface ConviteContract {
 
     interface View extends MvpView {
 
-        void atualizarListaRemetente();
+        void adicionarConviteRecebido(Convite convite);
 
-        void atualizarListaDestinatario();
+        void removerConviteRecebido(Convite convite);
+
+        void adicionarConviteEnviado(Convite convite);
+
+        void removerConviteEnviado(Convite convite);
+
+        void atualizarListaRecebidos();
+
+        void atualizarListaEnviados();
     }
 
     interface Presenter extends MvpPresenter<ConviteContract.View> {
-
-        void novoConvite(Grupo grupo, String email);
 
         void aceitarConvite(Convite convite);
 
         void revogarConvite(Convite convite);
 
         void recusarConvite(Convite convite);
+
+        void obterOsConvites();
     }
 }

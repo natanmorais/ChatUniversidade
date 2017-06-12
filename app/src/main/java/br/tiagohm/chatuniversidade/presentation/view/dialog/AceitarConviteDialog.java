@@ -22,7 +22,7 @@ import io.reactivex.ObservableOnSubscribe;
 /**
  * Created by root on 09/06/17.
  */
-public class AcceptConviteDialog extends AlertDialog.Builder{
+public class AceitarConviteDialog extends AlertDialog.Builder{
 
     @BindView(R.id.nomeGrupo)
     public EditText mNomeGrupo;
@@ -38,7 +38,7 @@ public class AcceptConviteDialog extends AlertDialog.Builder{
     private AlertDialog mDialog;
     private Convite mConvite;
 
-    public AcceptConviteDialog(Convite convite, Context context) {
+    public AceitarConviteDialog(Convite convite, Context context) {
         super(context);
 
         mConvite = convite;
@@ -50,7 +50,7 @@ public class AcceptConviteDialog extends AlertDialog.Builder{
 
         App.getChatComponent().inject(this);
 
-        mNomeGrupo.setText(mConvite.grupo.nome);
+        mNomeGrupo.setText(mConvite.nomeDoGrupo);
         mRemetenteConvite.setText(mConvite.remetente);
     }
 

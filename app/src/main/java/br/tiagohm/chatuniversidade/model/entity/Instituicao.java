@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class Instituicao implements Serializable {
 
     @Exclude
-    public transient String id;
+    public String id;
     @SerializedName("sigla")
     public String sigla;
     @SerializedName("nome")

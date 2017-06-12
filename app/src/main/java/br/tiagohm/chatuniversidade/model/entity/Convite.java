@@ -8,9 +8,11 @@ import java.io.Serializable;
 public class Convite implements Serializable {
 
     @Exclude
-    public transient String id;
+    public String id;
+    @SerializedName("nomeDoGrupo")
+    public String nomeDoGrupo;
     @SerializedName("grupo")
-    public Grupo grupo;
+    public String grupo;
     @SerializedName("remetente")
     public String remetente;
     @SerializedName("destinatario")
@@ -19,8 +21,9 @@ public class Convite implements Serializable {
     public Convite() {
     }
 
-    public Convite(Grupo grupo, String remetente, String destinatario) {
+    public Convite(String grupo, String nomeDoGrupo, String remetente, String destinatario) {
         this.grupo = grupo;
+        this.nomeDoGrupo = nomeDoGrupo;
         this.remetente = remetente;
         this.destinatario = destinatario;
     }

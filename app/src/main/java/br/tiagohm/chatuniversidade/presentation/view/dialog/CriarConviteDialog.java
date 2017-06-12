@@ -14,9 +14,6 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 
-/**
- * Created by root on 08/06/17.
- */
 public class CriarConviteDialog extends AlertDialog.Builder {
 
     @BindView(R.id.nomeGrupo)
@@ -28,13 +25,15 @@ public class CriarConviteDialog extends AlertDialog.Builder {
 
     private AlertDialog mDialog;
 
-    public CriarConviteDialog(Context context) {
+    public CriarConviteDialog(String nomeDoGrupo, Context context) {
         super(context);
 
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_criar_convite, null, false);
         setView(view);
 
         ButterKnife.bind(this, view);
+
+        mNomeGrupo.setText(nomeDoGrupo);
     }
 
     public Observable<Boolean> exibir() {
